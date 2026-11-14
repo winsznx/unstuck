@@ -22,7 +22,7 @@ export function AccountOverview({ account, now, actions }: { account: SignedInAc
           <h2 id="who" className="text-h2 font-semibold wrap-anywhere">
             {identity.handle}
           </h2>
-          <p className="mt-0.5 font-mono text-small wrap-anywhere text-ink-secondary">{identity.nearAccountId}</p>
+          {identity.nearAccountId && <p className="mt-0.5 font-mono text-small wrap-anywhere text-ink-secondary">{identity.nearAccountId}</p>}
           <p className="mt-1.5 text-small text-ink-muted">
             Signed in with NEAR Agent Market on {day(account.signedInAt)}. Access: <span className="font-mono">{account.scopes.join(", ") || HIRING_SCOPE}</span>
           </p>

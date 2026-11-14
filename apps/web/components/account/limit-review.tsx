@@ -43,7 +43,12 @@ export function LimitReview({
           <p className="font-semibold">Paid from</p>
           {identity ? (
             <p className="mt-1 text-ink-secondary">
-              {identity.handle}, <span className="font-mono text-small text-ink">{identity.nearAccountId}</span>
+              {identity.handle}
+              {identity.nearAccountId && (
+                <>
+                  , <span className="font-mono text-small text-ink">{identity.nearAccountId}</span>
+                </>
+              )}
             </p>
           ) : (
             <p className="mt-1 text-ink-secondary">Your Agent Market account, once you sign in.</p>

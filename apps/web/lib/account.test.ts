@@ -6,7 +6,6 @@ import {
   groupCode,
   limitUse,
   money,
-  readAccount,
   secondsLeft,
   type SpendingLimit,
 } from "./account";
@@ -21,12 +20,6 @@ const limit = (over: Partial<SpendingLimit> = {}): SpendingLimit => ({
   revokedAt: null,
   createdAt: now,
   ...over,
-});
-
-describe("readAccount", () => {
-  it("is signed out until Agent Market sign-in is wired", async () => {
-    expect(await readAccount()).toEqual({ status: "signed_out" });
-  });
 });
 
 describe("device code", () => {

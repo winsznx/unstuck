@@ -3,8 +3,8 @@
  * (market.near.ai advertises a device_authorization_endpoint and a "hiring" scope), so the owner
  * approves on market.near.ai and UNSTUCK never sees a password or a key.
  *
- * Nothing here is wired to market.near.ai yet: readAccount() answers signed out and the device
- * flow answers "unavailable". The types are the contract the screens are built against.
+ * This file is shared with client components, so it holds only types and pure helpers. The session,
+ * the token upkeep and readAccount() live server-side in lib/market-session.ts.
  */
 
 export const MARKET_ORIGIN = "https://market.near.ai";
@@ -13,8 +13,8 @@ export const HIRING_SCOPE = "hiring";
 export interface MarketIdentity {
   /** The account's handle on Agent Market, shown as the owner sees it there. */
   handle: string;
-  /** The NEAR account the balance lives on. */
-  nearAccountId: string;
+  /** The NEAR account the balance lives on. null when Agent Market didn't name one. */
+  nearAccountId: string | null;
 }
 
 /** Mirrors the mandates table and core's Mandate, with the fields a screen needs. */
@@ -71,13 +71,9 @@ export type DeviceFlow =
   | { kind: "denied" }
   | { kind: "error"; message: string };
 
+/** What startSignIn answers when this server can't keep a sign-in safe, because MARKET_TOKEN_KEY isn't set. */
 export const NOT_CONNECTED_REASON =
-  "UNSTUCK has no Agent Market client registered in this build, so no code can be issued.";
-
-/** Today there's no session store and no Agent Market client, so every visitor is signed out. */
-export async function readAccount(): Promise<AccountView> {
-  return { status: "signed_out" };
-}
+  "This server has no key to keep an Agent Market sign-in safe, so UNSTUCK won't ask for a code. The owner of this deployment sets MARKET_TOKEN_KEY to switch it on.";
 
 /* ---------- Device code ---------- */
 

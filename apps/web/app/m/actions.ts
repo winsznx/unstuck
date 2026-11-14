@@ -1,8 +1,14 @@
 "use server";
 
+import { randomUUID } from "node:crypto";
 import { z } from "zod";
 import { compareAsks, isJobStatus, latestPatch, queueGroup, type QueueGroup } from "@/lib/fix";
-import { jobsFor, milestoneViews } from "@/lib/queries";
+import { hire, type HireResult } from "@/lib/market-hire";
+import { insertJob, openJobFor } from "@/lib/market-jobs";
+import { currentMandate, currentSession, logMarket, withMarket } from "@/lib/market-session";
+import { jobsFor, milestoneView, milestoneViews } from "@/lib/queries";
+import { SITE_URL } from "@/lib/site";
+import { listedPrice } from "./[id]/fix/market";
 import { repoName } from "@/lib/format";
 import { milestoneStatus } from "@/lib/status";
 
@@ -56,21 +62,42 @@ export async function milestoneSummaries(input: unknown): Promise<MilestoneSumma
     });
 }
 
-export type HireResult = { kind: "idle" } | { kind: "not-switched-on"; agentName: string; priceCents: number | null } | { kind: "invalid"; message: string };
+export type { HireResult };
 
-const hire = z.object({ milestoneId: z.string().uuid(), agentId: z.string().min(1).max(100), agentName: z.string().max(200), priceCents: z.coerce.number().int().nonnegative().optional() });
+const hireForm = z.object({ milestoneId: z.string().uuid(), agentId: z.string().min(1).max(100), agentName: z.string().max(200), priceCents: z.coerce.number().int().nonnegative().optional() });
 
 /**
- * The hire button's action. Hiring needs an Agent Market session and a spending limit, and neither is wired in this
- * build, so it says so plainly. Nothing is sent to Agent Market and nothing is stored.
+ * The hire button's action. It checks the owner's Agent Market session and spending limit, saves the brief as a
+ * draft on Agent Market (MARKET_PREPARE_JOB) and answers its checkout page. The owner pays there; nothing here
+ * moves money.
  */
 export async function hireAgent(_prev: HireResult, form: FormData): Promise<HireResult> {
-  const parsed = hire.safeParse({
+  const parsed = hireForm.safeParse({
     milestoneId: form.get("milestoneId"),
     agentId: form.get("agentId"),
     agentName: form.get("agentName"),
     priceCents: form.get("priceCents") || undefined,
   });
   if (!parsed.success) return { kind: "invalid", message: "Choose an agent with a listed price first." };
-  return { kind: "not-switched-on", agentName: parsed.data.agentName, priceCents: parsed.data.priceCents ?? null };
+  try {
+    return await hire(
+      {
+        now: () => new Date(),
+        newId: randomUUID,
+        siteUrl: SITE_URL,
+        session: currentSession,
+        view: milestoneView,
+        openJob: openJobFor,
+        listedPrice,
+        mandate: currentMandate,
+        market: withMarket,
+        saveJob: insertJob,
+        log: logMarket,
+      },
+      { ...parsed.data, priceCents: parsed.data.priceCents ?? null },
+    );
+  } catch (error) {
+    logMarket("hire failed", error);
+    return { kind: "refused", message: "Something went wrong before UNSTUCK reached Agent Market. Nothing was charged. Try again in a minute." };
+  }
 }

@@ -267,7 +267,7 @@ export default function PreviewPage() {
                   checks={(missing.base?.replay.steps ?? []).map((s, i) => ({ n: i + 1, command: s.command, offline: s.network === "none" }))}
                 />
               </KitExample>
-              <KitExample label="Hire form (try it: answers that hiring isn't switched on)">
+              <KitExample label="Hire form (try it: answers with a sample checkout link)">
                 <HireForm action={sampleHire} milestoneId={SAMPLE_MILESTONE.id} agentId="a1" agentName="Docs Mason" priceCents={1_200} />
               </KitExample>
             </KitGrid>

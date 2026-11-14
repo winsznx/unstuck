@@ -88,7 +88,7 @@ export function DeviceFlowPanel({
       return (
         <Notice tone="good" title={`Signed in as ${flow.identity.handle}`} action={onContinue && <Button onClick={onContinue}>Set your spending limit</Button>}>
           Agent Market approved <span className="font-mono text-small">{HIRING_SCOPE}</span> access for{" "}
-          <span className="font-mono text-small text-ink">{flow.identity.nearAccountId}</span>. UNSTUCK can&apos;t hire anyone until you set a limit.
+          <span className="font-mono text-small text-ink">{flow.identity.nearAccountId ?? flow.identity.handle}</span>. UNSTUCK can&apos;t hire anyone until you set a limit.
         </Notice>
       );
 

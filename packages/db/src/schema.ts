@@ -1,6 +1,7 @@
 import { sql } from "drizzle-orm";
 import {
   bigserial,
+  boolean,
   index,
   integer,
   jsonb,
@@ -117,6 +118,13 @@ export const jobs = pgTable(
     approvalUrl: text("approval_url"),
     status: text("status").notNull(),
     autoAcceptAt: timestamp("auto_accept_at", { withTimezone: true }),
+    /** The agent's display name at hire, so screens don't show its id. */
+    agentName: text("agent_name"),
+    /** The title and brief sent with MARKET_PREPARE_JOB. A replay under the same client_request_id must repeat them exactly. */
+    title: text("title"),
+    brief: text("brief"),
+    /** The patch replay started from the agent's delivery. Set once, so a delivery is checked once. */
+    fixReplayId: uuid("fix_replay_id").references(() => replays.id),
     createdAt: createdAt(),
   },
   (t) => [uniqueIndex("jobs_client_request_idx").on(t.clientRequestId)],
@@ -124,6 +132,8 @@ export const jobs = pgTable(
 
 export const mandates = pgTable("mandates", {
   id: uuid("id").primaryKey().defaultRandom(),
+  /** The Agent Market handle the limit was set by. Hires spend only from a limit under the signed-in handle. */
+  marketHandle: text("market_handle"),
   perJobCapCents: integer("per_job_cap_cents").notNull(),
   totalCapCents: integer("total_cap_cents").notNull(),
   spentCents: integer("spent_cents").notNull().default(0),
@@ -131,6 +141,31 @@ export const mandates = pgTable("mandates", {
   revokedAt: timestamp("revoked_at", { withTimezone: true }),
   createdAt: createdAt(),
 });
+
+/** One OAuth client registration per authorization server, made lazily at the first sign-in. Public client: no secret. */
+export const marketClients = pgTable("market_clients", {
+  issuer: text("issuer").primaryKey(),
+  clientId: text("client_id").notNull(),
+  createdAt: createdAt(),
+});
+
+/** A signed-in Agent Market owner. Tokens are AES-256-GCM sealed with MARKET_TOKEN_KEY; the cookie holds only the id. */
+export const marketSessions = pgTable(
+  "market_sessions",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    handle: text("handle").notNull(),
+    nearAccountId: text("near_account_id"),
+    emailVerified: boolean("email_verified"),
+    accessTokenEnc: text("access_token_enc").notNull(),
+    refreshTokenEnc: text("refresh_token_enc"),
+    accessExpiresAt: timestamp("access_expires_at", { withTimezone: true }),
+    scopes: text("scopes").array().notNull(),
+    createdAt: createdAt(),
+    revokedAt: timestamp("revoked_at", { withTimezone: true }),
+  },
+  (t) => [index("market_sessions_handle_idx").on(t.handle)],
+);
 
 export const tasks = pgTable(
   "tasks",

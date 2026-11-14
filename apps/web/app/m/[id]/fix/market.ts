@@ -44,3 +44,14 @@ export async function codeAgents(): Promise<MarketRead> {
     return { ok: false, reason: error instanceof Error ? error.message : "Agent Market didn't answer." };
   }
 }
+
+/** The agent's live default price in cents, read again at hire so a stale page can't set what the owner pays. */
+export async function listedPrice(agentId: string): Promise<number | null> {
+  const plan = defaultPlan(await market.pricingPlans(agentId));
+  if (!plan) return null;
+  try {
+    return priceToCents(plan.price_amount);
+  } catch {
+    return null;
+  }
+}

@@ -14,6 +14,7 @@ import { PunchTag, tagFor } from "@/components/tag";
 import { clock, day, duration, plural, repoName, sha7 } from "@/lib/format";
 import { isJobStatus, latestPatch, partsFor, sendReadiness, type PartLink } from "@/lib/fix";
 import { programOf } from "@/lib/programs";
+import { reconcileJobs } from "@/lib/market-jobs";
 import { jobsFor, milestoneView, type AskView, type MilestoneView } from "@/lib/queries";
 import { milestoneStatus, stepRows, wholeDaysBetween, type MilestoneStatus, type StepRow } from "@/lib/status";
 
@@ -26,6 +27,7 @@ export async function generateMetadata({ params }: { params: Promise<{ id: strin
 
 export default async function MilestonePage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
+  await reconcileJobs(id);
   const [view, jobs] = await Promise.all([milestoneView(id), jobsFor(id)]);
   if (!view) notFound();
   const { milestone, asks, base } = view;

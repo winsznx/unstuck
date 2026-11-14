@@ -3,13 +3,17 @@ import { SiteFooter, SiteHeader } from "@/components/site";
 import { CONNECT_STEPS, type ConnectStep } from "./connect-state";
 import { ConnectFlow } from "./connect-flow";
 import { PRIVATE_PAGE } from "@/lib/seo";
+import { currentSession } from "@/lib/market-session";
 
 export const metadata: Metadata = { title: "Connect Agent Market", robots: PRIVATE_PAGE };
 
 const isStep = (value: string | undefined): value is ConnectStep => CONNECT_STEPS.some((step) => step === value);
 
+export const dynamic = "force-dynamic";
+
 export default async function ConnectPage({ searchParams }: { searchParams: Promise<{ step?: string }> }) {
   const { step } = await searchParams;
+  const session = await currentSession();
   return (
     <>
       <SiteHeader />
@@ -18,7 +22,10 @@ export default async function ConnectPage({ searchParams }: { searchParams: Prom
         <p className="mt-3 max-w-(--container-reading) text-lead text-ink-secondary">
           Two minutes, once. After this, UNSTUCK can hire an agent on NEAR Agent Market to build what your reviewer asked for, inside a limit you set.
         </p>
-        <ConnectFlow initialStep={isStep(step) && step !== "confirm" ? step : "about"} />
+        <ConnectFlow
+          initialStep={isStep(step) && step !== "confirm" ? step : "about"}
+          signedInAs={session ? { handle: session.handle, nearAccountId: session.nearAccountId } : null}
+        />
       </main>
       <SiteFooter />
     </>

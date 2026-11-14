@@ -13,7 +13,7 @@ export function DeviceFlowStates({ now, identity }: { now: string; identity: Mar
   const at = new Date(now);
   const flows: [string, DeviceFlow][] = [
     ["Before a code is asked for", { kind: "idle" }],
-    ["Sign-in switched off in this build", { kind: "unavailable", reason: NOT_CONNECTED_REASON }],
+    ["Sign-in off: no token key on this server", { kind: "unavailable", reason: NOT_CONNECTED_REASON }],
     ["Asking for a code", { kind: "requesting" }],
     [
       "Code issued, waiting for approval",

@@ -4,9 +4,9 @@ import Link from "next/link";
 import { useEffect, useReducer, useRef, useState, useTransition, type ReactNode } from "react";
 import { Button, ButtonLink } from "@/components/button";
 import { AccessTerms, DeviceFlowPanel, LimitForm, LimitReview, Notice } from "@/components/account";
-import { checkLimit, expiryFrom, money } from "@/lib/account";
+import { checkLimit, expiryFrom, money, type DeviceFlow, type MarketIdentity } from "@/lib/account";
 import { Stepper, type StepperItem } from "@/components/stepper";
-import { saveLimit, startSignIn, type SaveLimitResult } from "./actions";
+import { pollSignIn, saveLimit, startSignIn, type SaveLimitResult } from "./actions";
 import { CONNECT_STEPS, canOpenStep, connectReducer, INITIAL_CONNECT, signedIn, type ConnectStep } from "./connect-state";
 
 const TEXT: Record<ConnectStep, { title: string; lead: string; ahead: string }> = {
@@ -32,8 +32,16 @@ const TEXT: Record<ConnectStep, { title: string; lead: string; ahead: string }> 
   },
 };
 
-export function ConnectFlow({ initialStep }: { initialStep: ConnectStep }) {
-  const [state, dispatch] = useReducer(connectReducer, { ...INITIAL_CONNECT, step: initialStep });
+const POLL_FAILED: DeviceFlow = { kind: "error", message: "UNSTUCK lost touch with this page's sign-in. Get a new code to try again." };
+const SLOW_DOWN_SECONDS = 5;
+
+/** `signedInAs` is the session the server already holds, so a returning owner starts signed in. */
+export function ConnectFlow({ initialStep, signedInAs }: { initialStep: ConnectStep; signedInAs: MarketIdentity | null }) {
+  const [state, dispatch] = useReducer(connectReducer, {
+    ...INITIAL_CONNECT,
+    step: initialStep,
+    flow: signedInAs ? { kind: "approved", identity: signedInAs } : INITIAL_CONNECT.flow,
+  });
   const [now] = useState(() => new Date());
   const [pending, startTransition] = useTransition();
   const [saveResult, setSaveResult] = useState<SaveLimitResult | null>(null);
@@ -49,6 +57,31 @@ export function ConnectFlow({ initialStep }: { initialStep: ConnectStep }) {
     }
     headingRef.current?.focus();
   }, [state.step, state.saved]);
+
+  // Agent Market is the external system here: while a code is pending, ask the server once per interval whether the
+  // owner approved. Every answer dispatches a new flow object, which schedules the next poll or ends polling.
+  const { flow } = state;
+  useEffect(() => {
+    if (flow.kind !== "pending") return;
+    let cancelled = false;
+    const timer = setTimeout(async () => {
+      const next = await pollSignIn().catch((): DeviceFlow => POLL_FAILED);
+      if (cancelled) return;
+      dispatch({
+        type: "flow",
+        flow:
+          next.kind === "waiting"
+            ? new Date() >= flow.expiresAt
+              ? { kind: "expired" }
+              : { ...flow, intervalSeconds: flow.intervalSeconds + (next.slowDown ? SLOW_DOWN_SECONDS : 0) }
+            : next,
+      });
+    }, flow.intervalSeconds * 1000);
+    return () => {
+      cancelled = true;
+      clearTimeout(timer);
+    };
+  }, [flow]);
 
   const check = checkLimit(state.draft);
   const index = CONNECT_STEPS.indexOf(state.step);

@@ -12,6 +12,9 @@ import { centsLabel, isJobStatus, latestPatch } from "@/lib/fix";
 import { clock, repoName } from "@/lib/format";
 import { jobsFor, milestoneView } from "@/lib/queries";
 import { milestoneStatus } from "@/lib/status";
+import { limitUse, money, type SpendingLimit } from "@/lib/account";
+import { reconcileJobs } from "@/lib/market-jobs";
+import { currentMandate, currentSession, limitOf } from "@/lib/market-session";
 import { hireAgent } from "../../actions";
 import { codeAgents, type AgentOffer } from "./market";
 
@@ -22,6 +25,7 @@ export const metadata: Metadata = { title: "Get it fixed" };
 export default async function FixPage({ params, searchParams }: { params: Promise<{ id: string }>; searchParams: Promise<{ agent?: string | string[] }> }) {
   const { id } = await params;
   const { agent: agentParam } = await searchParams;
+  await reconcileJobs(id);
   const [view, jobs] = await Promise.all([milestoneView(id), jobsFor(id)]);
   if (!view) notFound();
   const { milestone, asks, base } = view;
@@ -77,7 +81,14 @@ export default async function FixPage({ params, searchParams }: { params: Promis
         <div className="grid items-start gap-8 lg:grid-cols-[minmax(0,1fr)_minmax(0,24rem)]">
           <div className="space-y-6">
             {job && isJobStatus(job.status) && (
-              <JobTracker status={job.status} agentName={job.agentId} priceCents={job.priceCents} createdAt={job.createdAt} marketUrl={job.approvalUrl} autoAcceptAt={job.autoAcceptAt} />
+              <JobTracker
+                status={job.status}
+                agentName={job.agentName ?? job.agentId}
+                priceCents={job.priceCents}
+                createdAt={job.createdAt}
+                marketUrl={job.approvalUrl}
+                autoAcceptAt={job.autoAcceptAt}
+              />
             )}
             {patch && (
               <Blocked
@@ -94,7 +105,9 @@ export default async function FixPage({ params, searchParams }: { params: Promis
     );
   }
 
-  const market = await codeAgents();
+  const [market, session] = await Promise.all([codeAgents(), currentSession()]);
+  const mandate = session ? await currentMandate(session.handle) : null;
+  const connection: Connection = { handle: session?.handle ?? null, limit: mandate ? limitOf(mandate) : null };
   const wanted = typeof agentParam === "string" ? agentParam : undefined;
   const chosen = market.ok ? market.offers.find((o) => o.agent.agent_id === wanted && o.hireable && o.plan) : undefined;
 
@@ -102,7 +115,7 @@ export default async function FixPage({ params, searchParams }: { params: Promis
     <PartPage title={title} lead={lead}>
       {job && (job.status === "failed" || job.status === "refunded") && (
         <div className="mb-8">
-          <JobTracker status={job.status} agentName={job.agentId} priceCents={job.priceCents} createdAt={job.createdAt} marketUrl={job.approvalUrl} />
+          <JobTracker status={job.status} agentName={job.agentName ?? job.agentId} priceCents={job.priceCents} createdAt={job.createdAt} marketUrl={job.approvalUrl} />
         </div>
       )}
       <div className="grid items-start gap-10 lg:grid-cols-[minmax(0,1fr)_minmax(0,26rem)] lg:gap-12">
@@ -145,7 +158,7 @@ export default async function FixPage({ params, searchParams }: { params: Promis
 
         <aside id="order" aria-label="Your hire" className="min-w-0 scroll-mt-24 space-y-5 lg:sticky lg:top-24">
           {workOrder}
-          <OrderPanel milestoneId={id} chosen={chosen} />
+          <OrderPanel milestoneId={id} chosen={chosen} connection={connection} />
         </aside>
       </div>
     </PartPage>
@@ -173,7 +186,20 @@ function cardProps(offer: AgentOffer, href: string, selected: boolean) {
   };
 }
 
-function OrderPanel({ milestoneId, chosen }: { milestoneId: string; chosen: AgentOffer | undefined }) {
+interface Connection {
+  handle: string | null;
+  limit: SpendingLimit | null;
+}
+
+function limitLine(limit: SpendingLimit | null): string {
+  if (!limit) return "Not set. Set one once, and no single hire can go over it.";
+  const use = limitUse(limit, new Date());
+  if (use.state === "active") return `Up to ${money(limit.perHireCapCents)} a hire, ${money(use.remainingCents)} left of ${money(limit.totalCapCents)}.`;
+  if (use.state === "used_up") return "Used up. Set a new one to hire again.";
+  return "Expired. Set a new one to hire again.";
+}
+
+function OrderPanel({ milestoneId, chosen, connection }: { milestoneId: string; chosen: AgentOffer | undefined; connection: Connection }) {
   return (
     <section aria-labelledby="order-title" className="rounded-sheet border border-ink bg-surface px-5 py-5">
       <h2 id="order-title" className="text-h3 font-semibold">
@@ -194,15 +220,33 @@ function OrderPanel({ milestoneId, chosen }: { milestoneId: string; chosen: Agen
         <Need
           title="Agent Market account"
           body={
-            <>
-              Not connected.{" "}
-              <Link className="font-medium text-ink underline underline-offset-4" href="/connect">
-                Connect with a short code
-              </Link>
-            </>
+            connection.handle ? (
+              `Signed in as ${connection.handle}.`
+            ) : (
+              <>
+                Not connected.{" "}
+                <Link className="font-medium text-ink underline underline-offset-4" href="/connect">
+                  Connect with a short code
+                </Link>
+              </>
+            )
           }
         />
-        <Need title="Spending limit" body="Not set. You set it at your first hire, and no single hire can go over it." />
+        <Need
+          title="Spending limit"
+          body={
+            connection.handle ? (
+              <>
+                {limitLine(connection.limit)}{" "}
+                <Link className="font-medium text-ink underline underline-offset-4" href="/connect?step=limit">
+                  {connection.limit ? "Change it" : "Set it"}
+                </Link>
+              </>
+            ) : (
+              "Not set. You set it after you sign in, and no single hire can go over it."
+            )
+          }
+        />
       </div>
 
       <div className="mt-5">
