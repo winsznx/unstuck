@@ -273,14 +273,14 @@ export function partsFor(view: Pick<MilestoneView, "milestone" | "asks" | "base"
 
   let three: Pick<PartLink, "state" | "status">;
   if (!stillMissing) three = allWork ? { state: "skipped", status: "Not needed" } : { state: "later", status: "After the run" };
-  else if (patch) three = { state: "done", status: "Fix delivered" };
+  else if (patch) three = { state: "done", status: "Fix in" };
   else if (latestJob === "failed" || latestJob === "refunded") three = { state: "current", status: "Hire again" };
   else if (latestJob) three = { state: "current", status: latestJob === "sent" ? "Waiting on the agent" : latestJob === "accepted" ? "Accepted" : latestJob === "working" ? "Agent working" : "Delivered" };
   else three = { state: "current", status: "Choose an agent" };
 
   let four: Pick<PartLink, "state" | "status">;
   if (allWork) four = { state: "skipped", status: "Not needed" };
-  else if (!patch) four = { state: "later", status: "After a fix" };
+  else if (!patch) four = stillMissing ? { state: "later", status: "Paste your fix" } : { state: "later", status: "After a fix" };
   else if (patch.replay.status === "queued" || patch.replay.status === "running") four = { state: "current", status: "Checking the fix" };
   else if (patch.replay.status === "error") four = { state: "current", status: "Couldn't run" };
   else four = ready ? { state: "done", status: "Passes" } : { state: "current", status: "Still failing" };

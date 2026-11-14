@@ -5,6 +5,7 @@ import type { ReactNode } from "react";
 import { AutoRefresh } from "@/components/auto-refresh";
 import { ButtonLink } from "@/components/button";
 import { AskCompare } from "@/components/fix/ask-compare";
+import { CheckFixForm } from "@/components/fix/check-fix-form";
 import { DiffView } from "@/components/fix/diff-view";
 import { PartPage, ResultStrip, type StripTone } from "@/components/fix/page-frame";
 import { StepTag } from "@/components/run/step-tag";
@@ -42,8 +43,8 @@ export default async function CheckPage({ params }: { params: Promise<{ id: stri
       lead={
         <>
           The same {plural(steps, "step", "steps")} your reviewer gave run again on a fresh copy of {repoName(milestone.codeRepoUrl)} at{" "}
-        <span className="font-mono">{sha7(milestone.pinnedSha)}</span> with the agent&apos;s change applied, in the same image, with the same network settings. A sentence turns Fixed only
-        when its step exits 0.
+          <span className="font-mono">{sha7(milestone.pinnedSha)}</span> with your fix applied, in the same image, with the same network settings. A sentence turns Fixed only
+          when its step exits 0.
         </>
       }
     >
@@ -52,6 +53,18 @@ export default async function CheckPage({ params }: { params: Promise<{ id: stri
       <div aria-live="polite" className="mb-8">
         <Verdict changes={changes} patchStatus={patch?.replay.status ?? null} patchError={patch?.replay.error ?? null} finishedAt={patch?.replay.finishedAt ?? null} id={id} />
       </div>
+
+      {!live && base?.replay.status === "finished" && milestone.codeRepoUrl && changes.length > 0 && (
+        <section aria-labelledby="fix-form-title" className="mb-10">
+          <h2 id="fix-form-title" className="text-h2 font-semibold">
+            {patch ? "Check another fix" : "Check your fix"}
+          </h2>
+          <p className="mt-1 mb-4 max-w-(--container-reading) text-body text-ink-secondary">
+            Your own commit or pull request, or the one an agent opened. Nothing is posted to GitHub.
+          </p>
+          <CheckFixForm milestoneId={id} repo={repoName(milestone.codeRepoUrl)} />
+        </section>
+      )}
 
       {live && patch && (
         <section aria-labelledby="live-title" className="mb-10">
@@ -96,16 +109,16 @@ export default async function CheckPage({ params }: { params: Promise<{ id: stri
           The change
         </h2>
         <p className="mt-1 max-w-(--container-reading) text-body text-ink-secondary">
-          {patch?.replay.patch ? "Exactly what the agent sent, applied on top of the reviewed commit. This is what the pull request will contain." : "The agent's patch shows up here, file by file, once it's delivered."}
+          {patch?.replay.patch ? "Exactly the change being checked, applied on top of the reviewed commit." : "The change shows up here, file by file, once you paste a fix or an agent delivers one."}
         </p>
         <div className="mt-4">
           {patch?.replay.patch ? (
             <DiffView patch={patch.replay.patch} />
           ) : (
             <p className="rounded-panel border border-dashed border-border-strong px-4 py-6 text-center text-body text-ink-secondary">
-              No change yet.{" "}
+              No change yet. Paste a fix above, or{" "}
               <Link className="font-medium text-ink underline underline-offset-4" href={`/m/${id}/fix`}>
-                Choose an agent to fix it
+                choose an agent to fix it
               </Link>
             </p>
           )}
@@ -138,11 +151,19 @@ function Verdict({
   let body: ReactNode;
   let action: ReactNode = null;
 
-  if (!patchStatus) {
+  if (changes.length === 0) {
+    tone = "unsure";
+    title = "No asks to compare";
+    body = <>This milestone was started without any asks, so a fix can&apos;t close anything. The run records still show every step.</>;
+  } else if (!patchStatus) {
     tone = "unsure";
     title = "Waiting for a fix";
-    body = <>{plural(missingBefore, "sentence is", "sentences are")} still missing on the reviewed commit. Once an agent delivers a change, it runs here automatically.</>;
-    action = <ButtonLink href={`/m/${id}/fix`}>Choose an agent</ButtonLink>;
+    body = <>{plural(missingBefore, "sentence is", "sentences are")} still missing on the reviewed commit. Paste your fix below, or have an agent build one.</>;
+    action = (
+      <ButtonLink href={`/m/${id}/fix`} variant="secondary">
+        Choose an agent
+      </ButtonLink>
+    );
   } else if (patchStatus === "queued" || patchStatus === "running") {
     title = patchStatus === "queued" ? "The fix is waiting for a runner" : "Checking the fix now";
     body = <>Results appear below as each step finishes. This page updates by itself.</>;
