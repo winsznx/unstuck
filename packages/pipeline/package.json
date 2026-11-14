@@ -1,0 +1,23 @@
+{
+  "name": "@unstuck/pipeline",
+  "private": true,
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts",
+    "./sentences": "./src/sentences.ts"
+  },
+  "scripts": {
+    "typecheck": "tsc -p .",
+    "harvest": "tsx src/harvest-cli.ts"
+  },
+  "dependencies": {
+    "@unstuck/core": "workspace:*",
+    "@unstuck/db": "workspace:*",
+    "@unstuck/integrations": "workspace:*",
+    "drizzle-orm": "0.45.4",
+    "zod": "4.6.7"
+  },
+  "devDependencies": {
+    "tsx": "4.23.15"
+  }
+}
