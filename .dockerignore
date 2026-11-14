@@ -1,0 +1,9 @@
+internal
+**/node_modules
+**/.next
+.git
+.env
+.env.*
+deploy/secrets
+deploy/worker.env
+deploy/web.env

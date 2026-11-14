@@ -1,0 +1,15 @@
+internal/
+node_modules/
+.env
+.env.*
+!.env.example
+.next/
+.vercel/
+.DS_Store
+*.log
+.turbo/
+coverage/
+deploy/secrets/
+deploy/worker.env
+*.tsbuildinfo
+deploy/web.env
