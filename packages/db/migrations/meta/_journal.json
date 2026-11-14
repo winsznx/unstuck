@@ -1,0 +1,27 @@
+{
+  "version": "7",
+  "dialect": "postgresql",
+  "entries": [
+    {
+      "idx": 0,
+      "version": "7",
+      "when": 1793969375815,
+      "tag": "0000_mysterious_drax",
+      "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1793973778069,
+      "tag": "0001_yielding_talon",
+      "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1793973896758,
+      "tag": "0002_dear_ezekiel_stane",
+      "breakpoints": true
+    }
+  ]
+}
