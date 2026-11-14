@@ -4,7 +4,9 @@ import { z } from "zod";
 import { enqueue, asks as asksTable, milestones, replays } from "@unstuck/db";
 import { parseThreadUrl, type GitHubClient } from "@unstuck/integrations/github";
 import { codeReposIn, pickReviewerComment } from "@unstuck/pipeline";
+import { suggestAsks } from "@unstuck/pipeline/suggest-asks";
 import { db } from "@/lib/db";
+import { nearAi } from "@/lib/near-ai";
 import { commitBefore, github, shapeAt, type CodeRead } from "./github-read";
 import { IMAGES } from "./images";
 
@@ -116,6 +118,35 @@ export async function readCode(repoUrl: string, at: string, from?: string): Prom
   }
 }
 
+export interface AskSuggestion {
+  start: number;
+  text: string;
+  reason: string;
+}
+
+/** `null` means NEAR AI isn't configured on this server, so the grantee picks every ask by hand. */
+export type AskSuggestions = { asks: AskSuggestion[]; model: string } | null;
+
+/**
+ * Reads the comment again from GitHub rather than trusting text from the browser, so credits are only spent on a
+ * real review comment.
+ */
+export async function suggestAsksFor(threadUrl: string, commentId: string): Promise<Result<AskSuggestions>> {
+  const ai = nearAi();
+  if (!ai) return { ok: true, value: null };
+  const thread = await read(threadUrl, github());
+  if (!thread.ok) return thread;
+  const comment = thread.value.comments.find((c) => c.id === commentId);
+  if (!comment) return { ok: false, error: "That comment is no longer on the thread." };
+  try {
+    const { asks, model } = await suggestAsks(comment.body, ai);
+    return { ok: true, value: { asks: asks.map(({ start, text, reason }) => ({ start, text, reason })), model } };
+  } catch (error) {
+    console.error("NEAR AI ask suggestion failed", error);
+    return { ok: false, error: "NEAR AI didn't answer, so nothing is ticked. Pick the asks yourself." };
+  }
+}
+
 const startInput = z.object({
   threadUrl: z.string().url(),
   commentId: z.string().min(1),
@@ -124,7 +155,7 @@ const startInput = z.object({
   image: z.enum(IMAGES),
   install: z.string().max(2000),
   asks: z
-    .array(z.object({ start: z.number().int().min(0), text: z.string().min(1).max(2000), command: z.string().max(2000) }))
+    .array(z.object({ start: z.number().int().min(0), text: z.string().min(1).max(2000), command: z.string().max(2000), suggested: z.boolean().optional() }))
     .min(1)
     .max(12),
 });
@@ -171,7 +202,7 @@ export async function startMilestone(raw: StartInput): Promise<Result<string>> {
 
     const askRows = await tx
       .insert(asksTable)
-      .values(input.asks.map((a) => ({ milestoneId: milestone.id, quote: a.text, quoteStart: a.start, summary: a.text, severity: "unclear" as const, source: "owner" })))
+      .values(input.asks.map((a) => ({ milestoneId: milestone.id, quote: a.text, quoteStart: a.start, summary: a.text, severity: "unclear" as const, source: a.suggested ? "near-ai" : "owner" })))
       .returning({ id: asksTable.id, quoteStart: asksTable.quoteStart });
     const askIdAt = new Map(askRows.map((row) => [row.quoteStart, row.id]));
 

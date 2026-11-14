@@ -4,7 +4,8 @@
   "type": "module",
   "exports": {
     "./github": "./src/github/index.ts",
-    "./agent-market": "./src/agent-market/index.ts"
+    "./agent-market": "./src/agent-market/index.ts",
+    "./near-ai": "./src/near-ai/index.ts"
   },
   "scripts": {
     "typecheck": "tsc -p ."

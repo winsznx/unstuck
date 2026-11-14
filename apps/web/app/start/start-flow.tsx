@@ -3,8 +3,8 @@
 import { useRouter } from "next/navigation";
 import { useEffect, useMemo, useReducer, useRef, useState, useTransition, type ReactNode } from "react";
 import { day, repoName } from "@/lib/format";
-import { readCode, readThread, startMilestone, type CodeRead, type Result, type ThreadRead } from "./actions";
-import { canOpen, initialState, isDone, reducer, STEPS, type FlowAction, type FlowState, type Step } from "./flow-state";
+import { readCode, readThread, startMilestone, suggestAsksFor, type CodeRead, type Result, type ThreadRead } from "./actions";
+import { canOpen, initialState, isDone, reducer, STEPS, type AskHelp, type FlowAction, type FlowState, type Step } from "./flow-state";
 import type { IMAGES } from "./images";
 import { AsksStep } from "./step-asks";
 import { ChecksStep } from "./step-checks";
@@ -67,6 +67,7 @@ export function StartFlow({ initialUrl, initial }: { initialUrl: string; initial
   const [draftCode, setDraftCode] = useState<CodeRead | null>(null);
   const [startedId, setStartedId] = useState<string | null>(null);
   const [lastUrl, setLastUrl] = useState(initialUrl);
+  const [askHelp, setAskHelp] = useState<AskHelp | null>(null);
   const [pending, startTransition] = useTransition();
   const router = useRouter();
   const headingRef = useRef<HTMLHeadingElement>(null);
@@ -96,6 +97,30 @@ export function StartFlow({ initialUrl, initial }: { initialUrl: string; initial
 
   const comment = state.thread?.comments.find((c) => c.id === state.commentId) ?? null;
   const fromReviewer = useMemo(() => (comment ? reviewerCommands(comment.body) : []), [comment]);
+
+  /** Asked once per comment, when the grantee moves on to picking asks. It never blocks the step. */
+  const askNearAi = (threadUrl: string, commentId: string, code: CodeRead, reviewer: readonly string[]) => {
+    if (askHelp?.commentId === commentId && askHelp.status !== "failed") return;
+    setAskHelp({ commentId, status: "loading" });
+    suggestAsksFor(threadUrl, commentId)
+      .then((result) => {
+        if (!result.ok) return setAskHelp({ commentId, status: "failed", error: result.error });
+        if (!result.value) return setAskHelp({ commentId, status: "off" });
+        const { asks, model } = result.value;
+        setAskHelp({ commentId, status: "ready", asks, model });
+        rawDispatch({
+          type: "suggested",
+          commentId,
+          asks: asks.map((a) => ({
+            start: a.start,
+            text: a.text,
+            command: suggestionsFor(a.text, code.shape, reviewer)[0]?.command ?? "",
+            suggested: true,
+          })),
+        });
+      })
+      .catch(() => setAskHelp({ commentId, status: "failed", error: "NEAR AI didn't answer, so nothing is ticked. Pick the asks yourself." }));
+  };
   const index = STEPS.indexOf(state.step);
 
   const items: StepperItem[] = STEPS.map((step) => {
@@ -147,7 +172,9 @@ export function StartFlow({ initialUrl, initial }: { initialUrl: string; initial
             onFind={(repoUrl, from) => run(() => readCode(repoUrl, comment.createdAt, from), setDraftCode)}
             onUse={() => {
               const chosen = draftCode ?? state.code;
-              if (chosen) dispatch({ type: "code", code: chosen });
+              if (!chosen) return;
+              dispatch({ type: "code", code: chosen });
+              if (state.thread) askNearAi(state.thread.threadUrl, comment.id, chosen, fromReviewer);
             }}
             onBack={() => dispatch({ type: "goto", step: "comment" })}
           />
@@ -159,6 +186,7 @@ export function StartFlow({ initialUrl, initial }: { initialUrl: string; initial
           <AsksStep
             comment={comment}
             asks={state.asks}
+            help={askHelp?.commentId === comment.id ? askHelp : null}
             onToggle={(s) =>
               dispatch({
                 type: "toggleAsk",

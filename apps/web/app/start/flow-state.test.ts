@@ -79,3 +79,19 @@ describe("start flow", () => {
     expect(reducer(initialState(thread), { type: "goto", step: "run" }).step).toBe("comment");
   });
 });
+
+describe("suggested asks", () => {
+  const thread = { suggestedCommentId: "c1" } as unknown as Parameters<typeof initialState>[0];
+  const picked = { start: 4, text: "Add a test.", command: "npm test", suggested: true };
+
+  it("ticks NEAR AI's picks when the grantee hasn't picked any", () => {
+    const next = reducer(initialState(thread), { type: "suggested", commentId: "c1", asks: [picked] });
+    expect(next.asks).toEqual([picked]);
+  });
+
+  it("leaves the grantee's own picks and other comments alone", () => {
+    const own = reducer(initialState(thread), { type: "toggleAsk", start: 0, text: "Host the docs.", command: "" });
+    expect(reducer(own, { type: "suggested", commentId: "c1", asks: [picked] }).asks.map((a) => a.start)).toEqual([0]);
+    expect(reducer(initialState(thread), { type: "suggested", commentId: "other", asks: [picked] }).asks).toEqual([]);
+  });
+});

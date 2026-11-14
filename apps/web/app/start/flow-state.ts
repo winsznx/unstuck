@@ -1,5 +1,12 @@
-import type { CodeRead, ThreadRead } from "./actions";
+import type { AskSuggestion, CodeRead, ThreadRead } from "./actions";
 import { imageFor, installFor } from "./repo-shape";
+
+/** NEAR AI's read of one comment. `off` means the server has no NEAR AI key. */
+export type AskHelp =
+  | { commentId: string; status: "loading" }
+  | { commentId: string; status: "ready"; asks: AskSuggestion[]; model: string }
+  | { commentId: string; status: "failed"; error: string }
+  | { commentId: string; status: "off" };
 
 export const STEPS = ["comment", "code", "asks", "steps", "run"] as const;
 export type Step = (typeof STEPS)[number];
@@ -8,6 +15,8 @@ export interface PickedAsk {
   start: number;
   text: string;
   command: string;
+  /** Ticked by NEAR AI's suggestion and left ticked by the grantee. */
+  suggested?: boolean;
 }
 
 export interface FlowState {
@@ -27,6 +36,7 @@ export type FlowAction =
   | { type: "code"; code: CodeRead }
   | { type: "toggleAsk"; start: number; text: string; command: string }
   | { type: "askCommand"; start: number; command: string }
+  | { type: "suggested"; commentId: string; asks: PickedAsk[] }
   | { type: "image"; image: string }
   | { type: "install"; install: string };
 
@@ -65,6 +75,10 @@ export function reducer(state: FlowState, action: FlowAction): FlowState {
         : [...state.asks, { start: action.start, text: action.text, command: action.command }];
       return { ...state, asks: asks.sort((a, b) => a.start - b.start) };
     }
+    case "suggested":
+      // A late answer never overrides picks the grantee already made, or picks for a different comment.
+      if (state.commentId !== action.commentId || state.asks.length > 0) return state;
+      return { ...state, asks: [...action.asks].sort((a, b) => a.start - b.start) };
     case "askCommand":
       return { ...state, asks: state.asks.map((a) => (a.start === action.start ? { ...a, command: action.command } : a)) };
     case "image":
