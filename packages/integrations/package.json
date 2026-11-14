@@ -1,0 +1,15 @@
+{
+  "name": "@unstuck/integrations",
+  "private": true,
+  "type": "module",
+  "exports": {
+    "./github": "./src/github/index.ts",
+    "./agent-market": "./src/agent-market/index.ts"
+  },
+  "scripts": {
+    "typecheck": "tsc -p ."
+  },
+  "dependencies": {
+    "zod": "4.6.7"
+  }
+}
