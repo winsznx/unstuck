@@ -1,0 +1,289 @@
+/*
+ * The landing's frame and fluid scale (docs/DESIGN.md 7.3). Every landing section is a Screen
+ * (components/landing/screen.tsx): one room tall, the room being the visible screen under the sticky header.
+ *
+ * Two units drive every size, both from the viewport alone:
+ * - fit runs from 0 on the smallest screens to 1rem at the design size, 1280 px wide with an 880 px room, following
+ *   whichever runs out first, the width or the room's height. Headings, the lead and the frame's spacing ride it.
+ * - u, the zoom, is 1rem up to 1600 px wide with an 880 px room, then grows with the smaller of the two, up to 2rem.
+ *   grow is what u adds over 1rem. Type, Tailwind's spacing scale, radii and the content width grow with it.
+ *
+ * A fluid size is MIN + fit * (DESIGN - MIN) / 1rem + grow * DESIGN / 1rem: MIN on the smallest screens, DESIGN at the
+ * design size, then in proportion with the zoom. Reading sizes have MIN = DESIGN, so they never shrink, only zoom.
+ */
+
+/*
+ * Height variants for compact layouts: viewports up to 900, 760 and 600 px tall. Width variants don't see a short
+ * laptop, so pair them for one, e.g. `lg:short:hidden`. `not-short:` and the others invert them.
+ */
+@custom-variant compact (@media (height <= 56.25rem));
+@custom-variant short (@media (height <= 47.5rem));
+@custom-variant tight (@media (height <= 37.5rem));
+
+@layer base {
+  :root {
+    /* The header is --header-height plus its hairline. svh, so a phone's sliding browser bars don't resize the room. */
+    --landing-room: calc(100svh - var(--header-height) - 1px);
+    --landing-fit: clamp(0rem, min((100vw - 10rem) / 70, (var(--landing-room) - 27.5rem) / 27.5), 1rem);
+    --landing-u: clamp(1rem, min(1vw, var(--landing-room) / 55), 2rem);
+    --landing-grow: calc(var(--landing-u) - 1rem);
+  }
+
+  /* The landing's header and footer keep the sections' column, which widens with the zoom. */
+  body:has(> main.landing) {
+    --container-content: calc(var(--landing-u) * 76);
+  }
+}
+
+@layer components {
+  .screen {
+    --text-display: calc(1.875rem + var(--landing-fit) * 2.375 + var(--landing-grow) * 4.25);
+    --text-section: calc(1.5rem + var(--landing-fit) * 1.375 + var(--landing-grow) * 2.875);
+    --text-h1: calc(1.5rem + var(--landing-fit) * 0.625 + var(--landing-grow) * 2.125);
+    --text-lead: calc(1.0625rem + var(--landing-fit) * 0.125 + var(--landing-grow) * 1.1875);
+    --text-h2: calc(var(--landing-u) * 1.3125);
+    --text-h3: var(--landing-u);
+    --text-quote: calc(var(--landing-u) * 1.25);
+    --text-comment: calc(var(--landing-u) * 1.125);
+    --text-input: var(--landing-u);
+    --text-body: calc(var(--landing-u) * 0.9375);
+    --text-small: calc(var(--landing-u) * 0.8125);
+    --text-log: calc(var(--landing-u) * 0.78125);
+    --text-tag: calc(var(--landing-u) * 0.75);
+
+    /* Spacing utilities and radii only zoom: they never shrink, so every min-h-11 target stays 44 px. */
+    --spacing: calc(var(--landing-u) / 4);
+    --radius-control: calc(var(--landing-u) * 0.375);
+    --radius-panel: calc(var(--landing-u) * 0.625);
+    --radius-sheet: calc(var(--landing-u) * 0.875);
+    --radius-stage: calc(var(--landing-u) * 1.25);
+
+    /* The fluid space scale, for sections too: pt-(--screen-gap), gap-(--screen-gap-md). */
+    --screen-pt: calc(1rem + var(--landing-fit) * 2.5 + var(--landing-grow) * 3.5);
+    --screen-pb: calc(0.5rem + var(--landing-fit) * 0.5 + var(--landing-grow));
+    --screen-gap: calc(1rem + var(--landing-fit) * 1.5 + var(--landing-grow) * 2.5);
+    --screen-gap-md: calc(0.75rem + var(--landing-fit) * 0.75 + var(--landing-grow) * 1.5);
+    --screen-gap-sm: calc(0.5rem + var(--landing-fit) * 0.5 + var(--landing-grow));
+    --screen-next-gap: calc(0.5rem + var(--landing-fit) + var(--landing-grow) * 1.5);
+    --screen-next-h: calc(var(--landing-u) * 2.75);
+    /* The header's gutter, so the content lines up with the logo at every width. */
+    --screen-gutter: 1rem;
+    --screen-measure: calc(var(--landing-u) * 34);
+    --screen-frame-min: 0px;
+
+    display: flex;
+    flex-direction: column;
+    min-height: var(--landing-room);
+    scroll-margin-top: calc(var(--header-height) + 1px);
+    font-size: var(--text-body);
+    line-height: var(--text-body--line-height);
+  }
+  @media (width >= 40rem) {
+    .screen {
+      --screen-gutter: 1.5rem;
+    }
+  }
+
+  .screen-frame {
+    position: relative;
+    display: flex;
+    flex: 1 0 auto;
+    flex-direction: column;
+    width: 100%;
+    max-width: var(--container-content);
+    min-height: var(--screen-frame-min);
+    margin-inline: auto;
+    padding: var(--screen-pt) var(--screen-gutter) var(--screen-pb);
+  }
+  .screen-body {
+    display: flex;
+    flex: 1 0 auto;
+    flex-direction: column;
+    justify-content: center;
+    gap: var(--screen-gap);
+  }
+  /* A phone reads top down: what the content leaves over sits above the Next link, not above the heading. */
+  @media (width < 40rem) {
+    .screen-body {
+      justify-content: flex-start;
+    }
+    .screen[data-bleed] > .screen-frame {
+      padding-bottom: 0;
+    }
+  }
+
+  /*
+   * The Next link hangs from the bottom edge of the room. With one, the frame stops the link's gap and height short
+   * of the room, and the zone runs from there to the frame's bottom: it has no height while the content leaves that
+   * space free, and as soon as the content takes it, the zone grows, its container query hides the link, and the
+   * content gets the space instead. So the link is either wholly inside the room or not shown, never cut by the fold,
+   * and no height breakpoint has to be kept in step with the content.
+   */
+  .screen[data-next] {
+    --screen-frame-min: calc(var(--landing-room) - var(--screen-next-gap) - var(--screen-next-h));
+  }
+  .screen[data-next] > .screen-frame {
+    flex-grow: 0;
+  }
+  .screen-next-zone {
+    position: absolute;
+    inset: var(--screen-frame-min) 0 0;
+    container: screen-next / size;
+    pointer-events: none;
+  }
+  .screen-next {
+    position: absolute;
+    top: calc(var(--screen-next-gap) - var(--screen-pb));
+    left: var(--screen-gutter);
+    white-space: nowrap;
+    pointer-events: auto;
+  }
+  @container screen-next (height > 1px) {
+    .screen-next {
+      display: none;
+    }
+  }
+
+  /* At night the graphite band sits close to the canvas, so its edges carry the stronger hairline. */
+  :root[data-theme="dark"] .screen-log {
+    border-color: var(--color-border-strong);
+  }
+
+  /* The section's pin grows and shrinks with its heading and sits on the heading's first line. */
+  .screen-pin {
+    --pin: max(1.75rem, var(--text-section) * 0.78);
+    width: var(--pin);
+    height: var(--pin);
+    margin-top: calc((var(--text-section) * var(--text-section--line-height) - var(--pin)) / 2);
+  }
+
+  /* Rail (components/landing/rail.tsx). Cards bleed to the screen's edges and leave a peek of the next one. */
+  .rail {
+    --rail-inset: var(--screen-gutter, 1rem);
+    --rail-peek: 2.5rem;
+    --rail-item: min(100cqi - 2 * var(--rail-inset) - var(--rail-peek), 24rem);
+    timeline-scope: --rail;
+  }
+  .rail-flush {
+    --rail-inset: 0px;
+  }
+  /* On a tall phone a section's one rail (Rail tall) takes a share of the height left after the heading. */
+  @media (width < 40rem) and (height > 47.5rem) {
+    .rail-tall {
+      --rail-min: clamp(14rem, 45svh, 26rem);
+    }
+  }
+
+  /*
+   * Fold (components/landing/fold.tsx) and every other disclosure on the landing: one summary style, the label at
+   * body weight 600 and a chevron in a ring that turns when it opens, the ring matching the A, B, C callouts.
+   */
+  .fold > summary {
+    display: flex;
+    width: fit-content;
+    min-height: calc(var(--landing-u) * 2.75);
+    align-items: center;
+    gap: 0.625rem;
+    font-size: var(--text-body);
+    line-height: var(--text-body--line-height);
+    font-weight: 600;
+    cursor: pointer;
+    list-style: none;
+  }
+  .fold > summary::-webkit-details-marker {
+    display: none;
+  }
+  .fold > summary::after {
+    content: "";
+    flex: none;
+    width: calc(var(--landing-u) * 1.25);
+    height: calc(var(--landing-u) * 1.25);
+    border-radius: 999px;
+    background: currentColor;
+    mask:
+      url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20'%3E%3Cpath d='M6.5 8.5 10 12l3.5-3.5' fill='none' stroke='black' stroke-width='1.75' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") center / 100% no-repeat,
+      radial-gradient(closest-side, transparent calc(100% - 1.5px), black calc(100% - 1.5px));
+    transition: rotate var(--duration-fast) var(--ease-standard);
+  }
+  .fold[open] > summary::after {
+    rotate: 180deg;
+  }
+  .fold[open] > summary {
+    margin-bottom: 0.25em;
+  }
+  .fold > summary:focus-visible {
+    outline-offset: 2px;
+  }
+}
+
+/* A rail's narrow mode, applied below the caller's breakpoint as max-lg:rail-scroll and so on. */
+@utility rail-scroll {
+  /* Positioned, so a card's absolute or sr-only text is clipped by the scroller instead of widening the page. */
+  position: relative;
+  display: block;
+  margin-inline: calc(var(--rail-inset) * -1);
+  /* Room for the focus ring of a card that is itself a link; overflow-x clips the block axis too. */
+  padding-block: 0.25rem;
+  overflow-x: auto;
+  overscroll-behavior-x: contain;
+  scroll-snap-type: x mandatory;
+  scroll-padding-inline: var(--rail-inset);
+  scrollbar-width: thin;
+  container-type: inline-size;
+  scroll-timeline: --rail inline;
+  /* The scroller reaches the screen's edges, where an outside ring would be cut off. */
+  &:focus-visible {
+    outline-offset: -2px;
+  }
+  /* On touch screens the hint under the rail replaces the scrollbar. */
+  @supports (animation-timeline: scroll()) {
+    @media (pointer: coarse) {
+      scrollbar-width: none;
+    }
+  }
+}
+@utility rail-row {
+  display: flex;
+  width: max-content;
+  padding-inline: var(--rail-inset);
+  & > * {
+    flex: 0 0 var(--rail-item);
+    min-width: 0;
+    min-height: var(--rail-min, auto);
+    scroll-snap-align: start;
+  }
+}
+/* Where you are in the rail: a thumb that slides with the scroll position, drawn in the surrounding text colour. */
+@utility rail-hint {
+  @supports (animation-timeline: scroll()) {
+    @media (pointer: coarse) {
+      display: block;
+      height: 0.1875rem;
+      margin: min(0.75rem, var(--screen-gap-sm, 0.75rem)) var(--rail-inset) 0;
+      border-radius: 999px;
+      background: color-mix(in srgb, currentColor 20%, transparent);
+      container-type: inline-size;
+      & > span {
+        display: block;
+        width: max(1.5rem, 25%);
+        height: 100%;
+        border-radius: inherit;
+        background: currentColor;
+        animation: rail-thumb linear both;
+        animation-timeline: --rail;
+      }
+    }
+  }
+}
+
+@keyframes rail-thumb {
+  to {
+    translate: calc(100cqi - 100%) 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .fold > summary::after {
+    transition: none;
+  }
+}

@@ -1,0 +1,431 @@
+@import "tailwindcss";
+@import "./tokens.css";
+@import "./landing.css";
+@import "./docs.css";
+
+@theme inline {
+  --font-sans: var(--font-schibsted), ui-sans-serif, system-ui, sans-serif;
+  --font-quote: var(--font-newsreader), ui-serif, Georgia, serif;
+  --font-mono: var(--font-jetbrains), ui-monospace, "SF Mono", monospace;
+}
+
+@layer base {
+  html {
+    color-scheme: light;
+    background: var(--color-canvas);
+    color: var(--color-ink);
+    accent-color: var(--color-ink);
+    -webkit-text-size-adjust: 100%;
+  }
+  body {
+    font-family: var(--font-sans);
+    font-size: var(--text-body);
+    line-height: var(--text-body--line-height);
+  }
+  /*
+   * The body is a column: header, the page, footer. <main> takes the room between, at full width, so a page's
+   * max-w and mx-auto centre it instead of shrinking it to its content.
+   */
+  main {
+    flex: 1 0 auto;
+    width: 100%;
+  }
+  ::selection {
+    background: var(--color-open-soft);
+  }
+  :focus-visible {
+    outline: 2px solid var(--color-focus);
+    outline-offset: 2px;
+  }
+  /* The light theme's graphite ring would vanish on the graphite log surfaces, so there it turns yellow, as in dark. */
+  .bg-log :focus-visible {
+    outline-color: var(--color-open);
+  }
+  /* A control scrolled into view by focus clears the sticky header, so Shift+Tab never leaves one behind it. */
+  :where(a, button, input, select, textarea, summary, [tabindex]) {
+    scroll-margin-top: calc(var(--header-height) + 1rem);
+  }
+  input::placeholder,
+  textarea::placeholder {
+    color: var(--color-ink-muted);
+  }
+}
+
+@layer components {
+  /* `text-log` is ambiguous (a size token and a color token share the name), so log sizing goes through this class. */
+  .log-type {
+    font-size: var(--text-log);
+    line-height: var(--text-log--line-height);
+  }
+
+  /* The punch tag (docs/DESIGN.md section 6): clipped top-left corner and a punched hole. */
+  .punch-tag {
+    --tag-fill: var(--color-open);
+    --tag-ink: var(--color-on-open);
+    --tag-edge: var(--color-open-edge);
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.375rem;
+    min-height: 1.5rem;
+    padding: 0.1875rem 0.625rem 0.1875rem 1.25rem;
+    border-radius: var(--radius-tag);
+    background: var(--tag-fill);
+    color: var(--tag-ink);
+    font-family: var(--font-sans);
+    font-size: var(--text-tag);
+    line-height: var(--text-tag--line-height);
+    font-weight: 600;
+    white-space: nowrap;
+    clip-path: polygon(0.4375rem 0, 100% 0, 100% 100%, 0 100%, 0 0.4375rem);
+    box-shadow: inset 0 0 0 1px var(--tag-edge);
+    -webkit-mask: radial-gradient(circle 0.1875rem at 0.625rem 50%, transparent 96%, black 100%);
+    mask: radial-gradient(circle 0.1875rem at 0.625rem 50%, transparent 96%, black 100%);
+  }
+  .punch-tag[data-verdict="missing"] {
+    --tag-fill: var(--color-fails);
+    --tag-ink: var(--color-on-state);
+    --tag-edge: var(--color-fails);
+  }
+  .punch-tag[data-verdict="works"],
+  .punch-tag[data-verdict="fixed"] {
+    --tag-fill: var(--color-passes);
+    --tag-ink: var(--color-on-state);
+    --tag-edge: var(--color-passes);
+  }
+  .punch-tag[data-verdict="unsure"] {
+    --tag-fill: var(--color-unsure-soft);
+    --tag-ink: var(--color-ink-secondary);
+    --tag-edge: var(--color-border-strong);
+    background-image: none;
+    outline: 1px dashed var(--color-border-strong);
+    outline-offset: -1px;
+  }
+
+  .punch-tag[data-size="lg"] {
+    gap: 0.5rem;
+    min-height: 2.25rem;
+    padding: 0.375rem 0.875rem 0.375rem 1.75rem;
+    font-size: var(--text-body);
+    clip-path: polygon(0.625rem 0, 100% 0, 100% 100%, 0 100%, 0 0.625rem);
+    -webkit-mask: radial-gradient(circle 0.25rem at 0.875rem 50%, transparent 96%, black 100%);
+    mask: radial-gradient(circle 0.25rem at 0.875rem 50%, transparent 96%, black 100%);
+  }
+  .punch-tag .punch-tag-n {
+    font-variant-numeric: tabular-nums;
+    padding-right: 0.4375rem;
+    margin-right: 0.0625rem;
+    border-right: 1px solid currentColor;
+    opacity: 0.85;
+  }
+
+  /* The reviewer's sentence, struck with a highlighter: a stroke under the lower part of the line, never a wash. */
+  .ask-mark {
+    --mark: var(--color-open-mark);
+    color: inherit;
+    background-color: transparent;
+    background-image: linear-gradient(transparent 0.62em, var(--mark) 0.62em, var(--mark) 1.18em, transparent 1.18em);
+    background-repeat: no-repeat;
+    background-size: 100% 100%;
+    padding: 0 0.08em;
+    box-decoration-break: clone;
+    -webkit-box-decoration-break: clone;
+    transition: --mark var(--duration-narrative) var(--ease-standard);
+  }
+  .ask-mark[data-verdict="missing"] {
+    --mark: var(--color-fails-mark);
+  }
+  .ask-mark[data-verdict="works"],
+  .ask-mark[data-verdict="fixed"] {
+    --mark: var(--color-passes-mark);
+  }
+  .ask-mark[data-verdict="unsure"] {
+    --mark: var(--color-unsure-soft);
+  }
+
+  /* The numbered pin at the start of each marked sentence. Same fill as its tag. */
+  .ask-pin {
+    display: inline-grid;
+    place-items: center;
+    min-width: 1.375rem;
+    height: 1.375rem;
+    margin-right: 0.3em;
+    padding: 0 0.3rem;
+    border-radius: 999px;
+    background: var(--color-open);
+    color: var(--color-on-open);
+    box-shadow: inset 0 0 0 1px var(--color-open-edge);
+    font-family: var(--font-sans);
+    font-size: var(--text-tag);
+    font-weight: 700;
+    line-height: 1;
+    font-variant-numeric: tabular-nums;
+    vertical-align: 0.14em;
+    font-style: normal;
+  }
+  .ask-pin[data-verdict="missing"] {
+    background: var(--color-fails);
+    color: var(--color-on-state);
+    box-shadow: none;
+  }
+  .ask-pin[data-verdict="works"],
+  .ask-pin[data-verdict="fixed"] {
+    background: var(--color-passes);
+    color: var(--color-on-state);
+    box-shadow: none;
+  }
+  .ask-pin[data-verdict="unsure"] {
+    background: var(--color-unsure-soft);
+    color: var(--color-ink-secondary);
+    box-shadow: none;
+    outline: 1px dashed var(--color-border-strong);
+    outline-offset: -1px;
+  }
+
+  /* The reviewer's comment, set as reading text. Their words stay in the serif; markup stays quiet. */
+  .comment-prose {
+    font-family: var(--font-quote);
+    font-size: var(--text-comment);
+    line-height: var(--text-comment--line-height);
+    color: var(--color-ink);
+    overflow-wrap: anywhere;
+  }
+  .comment-prose > * + * {
+    margin-top: 0.85em;
+  }
+  .comment-prose a {
+    color: inherit;
+    text-decoration: underline;
+    text-decoration-color: var(--color-border-strong);
+    text-decoration-thickness: 1px;
+    text-underline-offset: 0.18em;
+  }
+  .comment-prose a:hover {
+    text-decoration-color: var(--color-ink);
+  }
+  .comment-prose .comment-mention {
+    font-family: var(--font-sans);
+    font-size: 0.85em;
+    font-weight: 600;
+    text-decoration: none;
+  }
+  .comment-prose code {
+    font-family: var(--font-mono);
+    font-size: 0.8em;
+    padding: 0.1em 0.35em;
+    border-radius: 4px;
+    background: var(--color-surface-muted);
+    box-shadow: inset 0 0 0 1px var(--color-border);
+  }
+  .comment-prose pre {
+    padding: 0.875rem 1rem;
+    border-radius: var(--radius-control);
+    background: var(--color-surface-muted);
+    box-shadow: inset 0 0 0 1px var(--color-border);
+    font-family: var(--font-mono);
+    font-size: var(--text-log);
+    line-height: var(--text-log--line-height);
+    white-space: pre-wrap;
+  }
+  .comment-prose pre code {
+    padding: 0;
+    background: none;
+    box-shadow: none;
+    font-size: inherit;
+  }
+  .comment-prose ul,
+  .comment-prose ol {
+    padding-left: 1.25em;
+  }
+  .comment-prose ul {
+    list-style: disc;
+  }
+  .comment-prose ol {
+    list-style: decimal;
+  }
+  .comment-prose li + li {
+    margin-top: 0.3em;
+  }
+  .comment-prose li::marker {
+    color: var(--color-ink-muted);
+  }
+  .comment-prose blockquote {
+    padding-left: 0.875em;
+    border-left: 2px solid var(--color-border-strong);
+    color: var(--color-ink-secondary);
+  }
+  .comment-prose h1,
+  .comment-prose h2,
+  .comment-prose h3,
+  .comment-prose h4,
+  .comment-prose h5,
+  .comment-prose h6 {
+    font-family: var(--font-sans);
+    font-size: var(--text-h3);
+    font-weight: 650;
+    letter-spacing: -0.01em;
+  }
+  .comment-prose hr {
+    border: 0;
+    border-top: 1px solid var(--color-border);
+  }
+
+  /* The concrete stage that product scenes sit on: a faint survey grid, never a gradient. */
+  .stage {
+    background-color: var(--color-stage);
+    background-image:
+      linear-gradient(var(--color-stage-line) 1px, transparent 1px),
+      linear-gradient(90deg, var(--color-stage-line) 1px, transparent 1px);
+    background-size: 28px 28px;
+    background-position: -1px -1px;
+  }
+
+  /* The tag hung off a sheet's edge on a string. Only ever carries a verdict a stored run backs. */
+  .hung-tag {
+    position: relative;
+    display: inline-block;
+    transform: rotate(4deg);
+    transform-origin: 1rem 50%;
+    filter: drop-shadow(0 6px 10px color-mix(in srgb, var(--color-shadow) 28%, transparent));
+  }
+
+  /*
+   * Where you are, marked the way an inspector marks an item: the current section wears a graphite punch tag
+   * (clipped corner, punched hole). Graphite, never a verdict colour, because location is not a result.
+   */
+  .nav-tag {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    min-height: 2.25rem;
+    padding: 0 0.75rem 0 1.375rem;
+    border-radius: var(--radius-tag);
+    color: var(--color-ink-secondary);
+    font-size: var(--text-small);
+    font-weight: 550;
+    white-space: nowrap;
+    clip-path: polygon(0.5rem 0, 100% 0, 100% 100%, 0 100%, 0 0.5rem);
+    -webkit-mask: radial-gradient(circle 0.1875rem at 0.6875rem 50%, transparent 96%, black 100%);
+    mask: radial-gradient(circle 0.1875rem at 0.6875rem 50%, transparent 96%, black 100%);
+    transition:
+      background-color var(--duration-fast) var(--ease-standard),
+      color var(--duration-fast) var(--ease-standard);
+  }
+  .nav-tag:hover {
+    background: var(--color-surface-muted);
+    color: var(--color-ink);
+  }
+  .nav-tag[aria-current="page"] {
+    background: var(--color-ink);
+    color: var(--color-on-action);
+  }
+  /* The hole is cut by the mask, so the focus ring sits on a wrapper, never on the clipped tag itself. */
+  .nav-tag:focus-visible {
+    outline: none;
+  }
+  .nav-tag-wrap:has(.nav-tag:focus-visible) {
+    outline: 2px solid var(--color-focus);
+    outline-offset: 2px;
+    border-radius: var(--radius-control);
+  }
+
+  /* Keyboard hints, shown only where a keyboard is likely. */
+  .kbd {
+    display: inline-grid;
+    place-items: center;
+    min-width: 1.375rem;
+    height: 1.375rem;
+    padding: 0 0.3125rem;
+    border-radius: 4px;
+    border: 1px solid var(--color-border-strong);
+    border-bottom-width: 2px;
+    background: var(--color-surface);
+    color: var(--color-ink-secondary);
+    font-family: var(--font-sans);
+    font-size: 0.6875rem;
+    font-weight: 600;
+    line-height: 1;
+  }
+  @media (pointer: coarse) {
+    .kbd {
+      display: none;
+    }
+  }
+
+  /* Dialog sheets: the phone menu and the jump palette. */
+  dialog.sheet {
+    max-width: none;
+    max-height: none;
+    margin: 0;
+    padding: 0;
+    border: 0;
+    background: transparent;
+    color: var(--color-ink);
+  }
+  dialog.sheet::backdrop {
+    background: color-mix(in srgb, var(--color-shadow) 45%, transparent);
+    backdrop-filter: blur(2px);
+  }
+  dialog.sheet[open] .sheet-panel {
+    animation: sheet-in var(--duration-standard) var(--ease-standard);
+  }
+
+  /*
+   * A comment cropped to its last lines (CommentCard crop). The text cut off at the top shows through the top padding
+   * only, fading in there, so a body that isn't cut shows no fade. Where scroll timelines exist, a cut body fades over
+   * its whole first line instead, so a line sliced through its letters reads as an excerpt, not a rendering fault. The
+   * body lays out from the bottom, so what's cut is scrollable overflow, and its scroll timeline, which carries the
+   * longer fade, is only active while something is cut. Nothing moves: the timeline only switches the mask.
+   */
+  .comment-cut {
+    display: flex;
+    flex-direction: column-reverse;
+    overflow: hidden;
+    mask-image: linear-gradient(to bottom, transparent, black calc(var(--spacing) * 5));
+  }
+  @supports (animation-timeline: scroll()) {
+    .comment-cut {
+      animation: comment-cut linear both;
+      animation-timeline: scroll(self block);
+    }
+  }
+}
+
+@keyframes comment-cut {
+  from,
+  to {
+    mask-image: linear-gradient(
+      to bottom,
+      transparent calc(var(--spacing) * 2),
+      black calc(var(--spacing) * 5 + var(--text-comment) * var(--text-comment--line-height) * 1.25)
+    );
+  }
+}
+
+@keyframes sheet-in {
+  from {
+    opacity: 0;
+    transform: translateY(-6px);
+  }
+}
+
+@property --mark {
+  syntax: "<color>";
+  inherits: true;
+  initial-value: transparent;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ask-mark,
+  .nav-tag {
+    transition: none;
+  }
+  dialog.sheet[open] .sheet-panel {
+    animation: none;
+  }
+}
+
+/* The skip link focuses <main> with tabindex -1; that focus is a jump, not a control, so it draws no ring. */
+main[tabindex="-1"]:focus {
+  outline: none;
+}
