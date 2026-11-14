@@ -1,0 +1,21 @@
+{
+  "name": "@unstuck/worker",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "start": "tsx src/main.ts",
+    "cli": "tsx src/cli.ts",
+
+    "typecheck": "tsc -p ."
+  },
+  "dependencies": {
+    "@unstuck/core": "workspace:*",
+    "@unstuck/db": "workspace:*",
+    "@unstuck/integrations": "workspace:*",
+    "@unstuck/pipeline": "workspace:*",
+    "@unstuck/replay": "workspace:*",
+    "drizzle-orm": "0.45.4",
+    "tsx": "4.23.15",
+    "zod": "4.6.7"
+  }
+}
