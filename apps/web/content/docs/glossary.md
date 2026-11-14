@@ -22,7 +22,7 @@ The number a command ends with. 0 means success and anything else means failure.
 
 ## Fixed
 
-A tag for an ask that was Still missing on the reviewed commit and passes on an agent's change. No ask has it today, because rerunning on an agent's change isn't built. See [Asks and tags](/docs/asks-and-tags#fixed).
+A tag for an ask that was Still missing on the reviewed commit and whose check exits 0 once a fix is applied. The fix can be yours or an agent's. See [Asks and tags](/docs/asks-and-tags#fixed).
 
 ## Image
 
@@ -32,9 +32,17 @@ The container image a run's steps execute in, such as `node:22-bookworm-slim`. Y
 
 A command that runs once before the checks, with the network on, to fetch the packages they need. If it fails, no check runs and every ask is Not sure. See [Checks and reruns](/docs/checks#the-install-step).
 
+## MCP
+
+Model Context Protocol, the way agents and tools like Claude Code call outside services. UNSTUCK runs an MCP server at `https://unstuck-near.vercel.app/mcp` with four tools. See [Call UNSTUCK from an agent](/docs/agents#the-mcp-tools).
+
 ## Milestone
 
 In UNSTUCK, one reviewer comment you started a run on, with its page at `/m/<id>`. In a grant program it's the delivery your reviewer is assessing.
+
+## NEAR AI Cloud
+
+NEAR's hosted model service. UNSTUCK sends it the sentences of your reviewer's comment and gets back which ones are asks, with a reason for each. See [Asks and tags](/docs/asks-and-tags#what-counts-as-an-ask).
 
 ## Not sure
 
@@ -70,7 +78,7 @@ The set of public grant milestone reviews rerun with UNSTUCK, counted at [/study
 
 ## Tag
 
-The label an ask gets from a run: Works, Still missing or Not sure, plus Open before a run finishes and Fixed once an agent's change passes. See [Asks and tags](/docs/asks-and-tags#the-tags).
+The label an ask gets from a run: Works, Still missing or Not sure, plus Open before a run finishes and Fixed once a fix makes a Still missing ask pass. See [Asks and tags](/docs/asks-and-tags#the-tags).
 
 ## Works
 

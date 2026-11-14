@@ -11,7 +11,7 @@ const LEAD = "What it can't do yet, what gets published and what it costs.";
 const QUESTIONS = [
   {
     q: "Can I check my fix commit?",
-    a: "Not yet. A run uses the last commit before the review, so its record shows what your reviewer saw. Checking a change on top of it comes with hiring.",
+    a: "Yes. Paste its pull request, commit link or SHA. UNSTUCK applies it to the reviewed commit, reruns the same checks and marks each ask Fixed or not.",
   },
   {
     q: "My review is a file in the PR. Does that work?",

@@ -86,7 +86,7 @@ export function sendReadiness(view: Pick<MilestoneView, "asks" | "base" | "patch
   const fixClean = fixFinished && changes.every((c) => c.after.verdict !== "missing");
   const gates: Gate[] = [
     { label: "Your reviewer's steps were rerun on the reviewed commit", met: baseDone },
-    { label: "A fix came back from Agent Market", met: patch !== null },
+    { label: "A fix was pasted to check, yours or an agent's", met: patch !== null },
     { label: "The same steps passed on the fix", met: Boolean(fixClean) },
   ];
   if (!baseDone) return { kind: "locked", reason: "no-run", gates };

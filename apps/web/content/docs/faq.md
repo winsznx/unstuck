@@ -26,7 +26,7 @@ Only where a sentence can become a check. If one asks for nothing you can test, 
 
 ### Can I check my fix commit?
 
-Not yet. A run uses the last commit before the review, so its record shows what your reviewer saw. Checking a change on top of it comes with hiring. See [Checks and reruns](/docs/checks#the-commit).
+Yes. Paste its pull request, commit link or SHA on the check screen. UNSTUCK applies it to the reviewed commit, reruns the same checks and marks each ask Fixed, Still missing or Broke. See [Hiring a fix](/docs/get-it-fixed#checking-a-fix).
 
 ### What does Works mean?
 
@@ -74,7 +74,7 @@ Not today. The screens are built, but hiring is switched off. See [Hiring a fix]
 
 ### Can my own agent call UNSTUCK?
 
-Not yet. There is no Agent Market listing and no MCP server. See [Call UNSTUCK from an agent](/docs/agents).
+Yes, through the MCP server at `https://unstuck-near.vercel.app/mcp`. It has four tools and needs no sign-in. There's no Agent Market listing yet. See [Call UNSTUCK from an agent](/docs/agents).
 
 ## Cost and data
 

@@ -13,10 +13,10 @@ Approval and payment stay with your program. UNSTUCK reports what a command did 
 
 ## What it reads and what it skips
 
-- It checks the commit your reviewer saw. It does not yet check your fix, so a record can't show that something was fixed.
+- A run checks the commit your reviewer saw. A fix is only checked when you paste it on the check screen, and it's checked as a diff applied on top of that commit.
 - It reads public GitHub threads and public repos. Private repos aren't supported.
 - It reads the comment, not the files the comment links to. Linked evaluation files, common at Web3 Foundation, aren't read yet.
-- It doesn't decide which sentences are asks or which of them block payment. You pick the asks, and each is stored as not clear whether it blocks payment.
+- It doesn't decide which sentences are asks or which of them block payment. NEAR AI suggests asks, you keep or change its picks, and each ask is stored as not clear whether it blocks payment.
 - It doesn't reword your reviewer. Each ask is a word-for-word span of their comment, checked against GitHub before it's saved, and the record links to the whole comment.
 
 ## What it never does for you
@@ -37,4 +37,4 @@ Reading the comment and rerunning checks are free. Hiring isn't switched on, so 
 
 ## What isn't built
 
-NEAR sign-in and payment, reruns on an agent's change, NEAR AI suggesting asks, UNSTUCK's MCP server and its own Agent Market listing don't exist yet. [Call UNSTUCK from an agent](/docs/agents) describes the planned interface.
+NEAR sign-in and payment, UNSTUCK's own Agent Market listing and a Claude Code skill don't exist yet. Hiring an agent is built but switched off. [Call UNSTUCK from an agent](/docs/agents) covers the MCP server, which is live.

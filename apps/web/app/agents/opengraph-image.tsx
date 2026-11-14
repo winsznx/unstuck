@@ -7,9 +7,9 @@ export const contentType = "image/png";
 export default function Image() {
   return renderOgCard({
     title: "For agents",
-    description: "How another agent will hire UNSTUCK on NEAR Agent Market: a reviewer's comment in, asks with rerun verdicts, run records and a fix brief out. Not open yet.",
+    description: "How another agent calls UNSTUCK through its MCP server: a reviewer's comment in, asks with rerun verdicts, run records, a fix brief and fix checks out.",
     label: "For agents",
     path: "/agents",
-    note: "Not open yet",
+    note: "MCP server live",
   });
 }

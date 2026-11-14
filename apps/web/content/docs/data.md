@@ -10,17 +10,21 @@ UNSTUCK reads public GitHub, saves what a run needs to be checked later, and sho
 | The file list at that commit, and its `package.json` scripts and package manager | To suggest an install, a container image and checks |
 | The code itself, at that one commit | The run fetches it into a fresh container |
 
-All of it is public data. UNSTUCK doesn't sign in as you or ask for a GitHub token from you. Private repos are refused. While you move between steps, repeated reads of the same thread are cached for five minutes. Starting a run reads the comment fresh.
+All of it is public data. UNSTUCK doesn't sign in as you or ask for a GitHub token from you. Private repos are refused. While you move between steps, repeated reads of the same thread are cached for five minutes. Starting a run reads the comment fresh. Checking a fix also reads the pull request's head commit and GitHub's diff from the reviewed commit to the fix.
 
 The run's install step, and only that step besides the checkout, uses the network. It downloads the packages it names from wherever the install command points.
+
+## What it sends to NEAR AI
+
+To suggest asks, UNSTUCK sends NEAR AI Cloud the sentences of your reviewer's comment, numbered, and nothing else. No code, repo name, login or link goes with them. NEAR AI answers with sentence numbers and a short reason for each. Without a NEAR AI key on the server, nothing is sent and you pick the asks by hand.
 
 ## What it keeps
 
 Starting a run saves:
 
 - The milestone: the thread link, repo, title and opener's login, the code repo, the pinned commit, and the reviewer's login and comment, including its full text, link and time.
-- Each ask: the quoted sentence and where it starts in the comment.
-- The run: the container image, the planned steps, their status, any error, and start and finish times.
+- Each ask: the quoted sentence, where it starts in the comment, and whether you picked it or kept it from a NEAR AI suggestion.
+- The run: the container image, the planned steps, their status, any error, and start and finish times. A fix check also keeps the diff it applied.
 - For each step: the command, whether the network was on, the exit code, whether it timed out, how long it took, the last 64 KB of output, the [output hash](/docs/glossary#output-hash) of the full output, and the number of bytes.
 
 A work queue holds the pending runs. Tables for hires and spending limits exist, but hiring is off and nothing is written to them.

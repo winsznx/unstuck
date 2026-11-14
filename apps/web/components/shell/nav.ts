@@ -12,7 +12,7 @@ export interface Place {
 export const PLACES: readonly Place[] = [
   { href: "/m", label: "Milestones", hint: "Every milestone you've started, and where each one stands", also: ["/runs"] },
   { href: "/study", label: "Study", hint: "What rerunning public grant reviews turned up" },
-  { href: "/agents", label: "For agents", hint: "How your own agent will call UNSTUCK. Not open yet" },
+  { href: "/agents", label: "For agents", hint: "How your own agent calls UNSTUCK over MCP" },
   { href: "/docs", label: "Docs", hint: "How asks, checks, tags and run records work, and what UNSTUCK won't do" },
 ];
 

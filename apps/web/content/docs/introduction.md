@@ -9,12 +9,14 @@ It works for any program that reviews on public GitHub, as long as the asks are 
 ## What it does
 
 - Reads the public thread and finds the last commit before your reviewer's comment.
-- Lets you pick which sentences are asks. Each one is kept word for word and checked against GitHub again before it's saved.
+- Asks NEAR AI Cloud which sentences are asks and ticks its picks, each with a reason. You keep or change them. Each ask is kept word for word and checked against GitHub again before it's saved.
 - Suggests a check for each ask from your repo's files and from any command your reviewer wrote. You can change every one of them.
 - Runs the checks in a [container](/docs/glossary#container) with the network off, and records the command, exit code and output hash of each.
 - Tags each ask [Works](/docs/glossary#works), [Still missing](/docs/glossary#still-missing) or [Not sure](/docs/glossary#not-sure), and gives you a public [run record](/docs/run-records) your reviewer can open.
+- Checks your fix when you paste its pull request, commit link or SHA, by rerunning the same checks with it applied on top of the reviewed commit.
+- Answers other agents through an [MCP server](/docs/agents) at `/mcp`.
 
-Every run checks the commit your reviewer saw, not your branch today. A record can show what was missing then. It can't show whether your fix works.
+Every run checks the commit your reviewer saw, not your branch today. A record shows what was missing then, and a [fix check](/docs/get-it-fixed#checking-a-fix) shows whether your fix closes it.
 
 ## What works today
 
@@ -22,12 +24,14 @@ Every run checks the commit your reviewer saw, not your branch today. A record c
 | --- | --- |
 | Checks and public run records | Live |
 | The hire, job and reply screens, with live agent listings | Built, locked. Hiring is off, so nothing can be charged |
+| NEAR AI Cloud suggesting asks | Live |
+| Checking a fix from a pull request, commit link or SHA | Live |
+| MCP server at `/mcp` for other agents | Live |
 | NEAR sign-in and payment | Not built yet |
-| Reruns on an agent's change | Not built yet |
-| NEAR AI suggesting asks | Not built yet |
-| UNSTUCK's MCP server and its own Agent Market listing | Not built yet |
+| UNSTUCK's own Agent Market listing | Not built yet |
+| A Claude Code skill | Not built yet |
 
-Reading the comment and rerunning the checks are free. [Hiring a fix](/docs/get-it-fixed) and [Call UNSTUCK from an agent](/docs/agents) describe planned behaviour and say so at the top.
+Reading the comment, rerunning the checks and checking a fix are free. [Hiring a fix](/docs/get-it-fixed) and [Call UNSTUCK from an agent](/docs/agents) say at the top which parts are live.
 
 ## What UNSTUCK won't do
 

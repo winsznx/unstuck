@@ -8,7 +8,7 @@ The top of the page names the repo and the first seven characters of the commit,
 | --- | --- |
 | Commit | The full commit hash, with a copy button |
 | Repository | The code repo on GitHub |
-| Ran on | The reviewed commit, unchanged |
+| Ran on | The reviewed commit, unchanged, or for a [fix check](/docs/get-it-fixed#checking-a-fix) a proposed fix and how many files it changes |
 | Image | The container image the steps ran in |
 | Started, Finished, Took | Times in UTC |
 | Reviewer's comment | A link to the comment on GitHub |
@@ -36,7 +36,7 @@ Every record with steps ends with a script you can paste into a terminal. You ne
 3. Runs each step in its own container from the same image, with the same network setting, a read-only root, a scratch `/tmp`, `HOME` and `CI` set, all capabilities dropped and no privilege escalation.
 4. Removes the volume.
 
-The script doesn't set the CPU, memory, process or time limits the worker applies, so a very heavy check could behave differently on a small machine. A command that prints timings or absolute paths won't produce the same output hash either.
+The script doesn't set the CPU, memory, process or time limits the worker applies, so a very heavy check could behave differently on a small machine. A command that prints timings or absolute paths won't produce the same output hash either. On a fix check's record the script leaves the fix out, so it reruns the reviewed commit.
 
 ## Where records live
 

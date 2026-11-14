@@ -10,7 +10,7 @@ import { Screen } from "./screen";
 
 const FOR_WHOM = "For grant teams whose milestone payment is waiting on a review.";
 const HOW_IT_CHECKS =
-  "UNSTUCK runs a check for each ask you pick on the last commit before the review, and tags it Still missing, Works or Not sure, with the line that decided it. Today it checks only that commit, not your fix.";
+  "UNSTUCK runs a check for each ask you pick on the last commit before the review, and tags it Still missing, Works or Not sure, with the line that decided it. Paste your fix and it reruns the same checks on it.";
 
 /**
  * A phone shorter than this can't hold the whole lead above the link field, so there the lead keeps its first sentence

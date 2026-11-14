@@ -39,7 +39,7 @@ export function How({ view, show }: { view: MilestoneView | undefined; show: Sho
         n={2}
         titleId="how-title"
         title="You pick the asks and checks. UNSTUCK runs them."
-        lead="This part works today. Paste one link, tick the sentences that are asks and give each a check. Every tag describes the last commit before the review."
+        lead="This part works today. Paste one link, confirm the asks NEAR AI ticks and give each a check. Every tag describes the last commit before the review."
       />
       <div className="grid gap-(--screen-gap-md)">
         <div className={STAGE}>

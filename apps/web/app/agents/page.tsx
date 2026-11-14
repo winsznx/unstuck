@@ -15,14 +15,15 @@ export const dynamic = "force-dynamic";
 
 export const metadata: Metadata = pageMetadata({
   title: "For agents",
-  description: "How another agent will hire UNSTUCK on NEAR Agent Market: a reviewer's comment in, asks with rerun verdicts, run records and a fix brief out. Not open yet.",
+  description: "How another agent calls UNSTUCK through its MCP server: a reviewer's comment in, asks with rerun verdicts, run records, a fix brief and fix checks out.",
   path: "/agents",
 });
 
 const INPUT: { field: string; required: boolean; body: string }[] = [
   { field: "thread", required: true, body: "A public GitHub issue or pull request URL. A link to one comment picks that comment." },
-  { field: "asks", required: false, body: "The reviewer's sentences that count as asks, copied exactly. Any sentence that isn't in the comment word for word is refused." },
-  { field: "checks", required: false, body: "Shell commands run offline at the reviewed commit, each tied to an ask by its number. An ask with no check comes back not_sure, never guessed." },
+  { field: "repo", required: false, body: "The code repo's GitHub address, when the thread links several repos or none." },
+  { field: "asks", required: false, body: "The reviewer's sentences that count as asks, copied exactly. Any sentence not in the comment word for word is refused. Leave it out and NEAR AI picks them." },
+  { field: "checks", required: false, body: "Shell commands run offline at the reviewed commit, each tied to an ask by its number. An ask with no command gets one suggested from the repo." },
   { field: "image", required: false, body: "The container image for the checks. Defaults to one picked from the repo's own files." },
 ];
 
@@ -75,7 +76,7 @@ export default async function AgentsPage() {
       <SiteHeader />
       <main id="main-content" className="pb-8">
         <PageHead
-          title="Hire UNSTUCK from your own agent"
+          title="Call UNSTUCK from your own agent"
           lead="Hand it a reviewer's comment on a public GitHub thread. It reruns the reviewer's checks at the commit they saw and returns each ask word for word with a verdict, a link to the run record behind it, and a brief a fixing agent can start from."
           aside={<Availability />}
         />
@@ -123,15 +124,15 @@ export default async function AgentsPage() {
         </section>
 
         <section aria-labelledby="ways-title" className="mx-auto max-w-(--container-content) px-4 pt-20 sm:px-6 lg:pt-28">
-          <SectionHead id="ways-title" title="Three ways to call it" lead="None of these is open yet. This is the interface they're being built to." />
+          <SectionHead id="ways-title" title="Three ways to call it" lead="The MCP server is live. The market listing and the skill aren't open yet." />
           <div className="mt-10 grid grid-cols-1 gap-6 lg:grid-cols-3">
             <Way title="A job on NEAR Agent Market" state="Not listed yet" body="Post a job to the unstuck seller with the thread link in the brief. The answer above comes back as the delivery, and the run record link is the evidence the buyer accepts against.">
               <CodeBlock title="Job brief" code={`unstuck check ${thread}`} />
             </Way>
-            <Way title="An MCP tool" state="Planned" body="One tool, unstuck_check, for any MCP client. Same input fields, same answer.">
-              <CodeBlock title="Tool" code={MCP_TOOL} maxHeight="max-h-[16rem]" />
+            <Way title="An MCP server" state="Live" body={`At ${origin}/mcp, no sign-in. Four tools: unstuck_check, unstuck_status, unstuck_check_fix and unstuck_suggest_asks.`}>
+              <CodeBlock title="Claude Code" code={`claude mcp add --transport http unstuck ${origin}/mcp`} maxHeight="max-h-[16rem]" />
             </Way>
-            <Way title="A Claude Code skill" state="Planned" body="Run it from the terminal on a thread you're working on. It prints the asks, their verdicts and the brief.">
+            <Way title="A Claude Code skill" state="Not built yet" body="It would run from the terminal on a thread you're working on and print the asks, their verdicts and the brief.">
               <CodeBlock title="Terminal" code={`$ unstuck check ${thread}`} />
             </Way>
           </div>
@@ -143,7 +144,7 @@ export default async function AgentsPage() {
               <h2 id="terms-title" className="text-section font-semibold text-balance">
                 Price
               </h2>
-              <p className="mt-4 text-lead text-ink-secondary">Not listed yet. When the listing opens, its price is set on NEAR Agent Market and shown there before any job is posted.</p>
+              <p className="mt-4 text-lead text-ink-secondary">The MCP server is free. The market listing isn&apos;t open yet. When it opens, its price is set on NEAR Agent Market and shown there before any job is posted.</p>
               <p className="mt-4 text-body text-ink-secondary">Grantees using UNSTUCK directly read and rerun for free.</p>
               <ButtonLink href="/start" variant="secondary" className="mt-8">
                 Try it on a thread yourself
@@ -179,30 +180,11 @@ const SHAPE = JSON.stringify(
   2,
 );
 
-const MCP_TOOL = JSON.stringify(
-  {
-    name: "unstuck_check",
-    description: "Rerun a grant reviewer's checks at the commit they reviewed and report what is still missing.",
-    input_schema: {
-      type: "object",
-      required: ["thread"],
-      properties: {
-        thread: { type: "string", description: "Public GitHub issue, pull request or comment URL" },
-        asks: { type: "array", items: { type: "string" } },
-        checks: { type: "array", items: { type: "object", properties: { ask: { type: "integer" }, command: { type: "string" } }, required: ["command"] } },
-        image: { type: "string" },
-      },
-    },
-  },
-  null,
-  2,
-);
-
 function Availability() {
   const rows: [string, string][] = [
     ["NEAR Agent Market listing", "Not listed yet"],
-    ["MCP server", "Planned"],
-    ["Claude Code skill", "Planned"],
+    ["MCP server", "Live at /mcp"],
+    ["Claude Code skill", "Not built yet"],
     ["The check itself", "Live on this site"],
   ];
   return (

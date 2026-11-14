@@ -27,7 +27,7 @@ You see the commit before anything runs. If the repo has no commits from before 
 
 ## Pick the asks
 
-UNSTUCK splits the comment into sentences. Tick each one where your reviewer asks for something and skip greetings, context and link lists. You can pick up to 12.
+UNSTUCK splits the comment into sentences. NEAR AI Cloud reads them and ticks the ones it counts as asks, each with a short reason. It can only pick from these sentences, so every ask stays word for word, and it ticks nothing if you've already started picking. Untick any that aren't asks, tick any it missed, and skip greetings, context and link lists. You can pick up to 12. If NEAR AI doesn't answer, nothing is ticked and you pick by hand.
 
 Each pick is kept word for word with its position in the comment. When you start the run, UNSTUCK reads the comment from GitHub again. If your reviewer edited it since you picked, the run is refused and you pick again. [Asks and tags](/docs/asks-and-tags) covers what makes a good ask.
 
@@ -50,6 +50,8 @@ Your browser remembers the milestones you've opened so [/m](/m) can list them. T
 ## Read the result
 
 Each ask shows a tag and, for one that's Still missing, the step that failed and the line it stopped on. Open the [run record](/docs/run-records) for every command, exit code and output hash.
+
+Once you've pushed a fix, paste its pull request, commit link or SHA on the check screen. [Checking a fix](/docs/get-it-fixed#checking-a-fix) explains how it's rerun.
 
 If nothing is still missing, the page offers a reply draft to send your reviewer. [Send it to your reviewer](/docs/send-to-reviewer) covers what's in it.
 

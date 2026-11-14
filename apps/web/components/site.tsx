@@ -34,7 +34,7 @@ const FOOTER = [
     title: "NEAR Agent Market",
     links: [
       { href: "/connect", label: "How sign-in will work" },
-      { href: "/agents", label: "How your agent will call UNSTUCK" },
+      { href: "/agents", label: "How your agent calls UNSTUCK" },
       { href: "https://market.near.ai", label: "market.near.ai" },
     ],
   },

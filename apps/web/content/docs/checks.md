@@ -24,7 +24,7 @@ If the install fails or times out, the run stops there. No check runs, and every
 
 ## The commit
 
-A run uses the last commit before the review, so its record shows what your reviewer saw. Later pushes to your branch don't change it. That is why a record can show what was missing and can't yet show a fix: checking a change on top of the reviewed commit comes with [hiring](/docs/get-it-fixed), which is off.
+A run uses the last commit before the review, so its record shows what your reviewer saw. Later pushes to your branch don't change it. To see whether a fix works, [check it](/docs/get-it-fixed#checking-a-fix): UNSTUCK applies it on top of the reviewed commit and reruns the same steps.
 
 ## The container
 
@@ -53,4 +53,4 @@ You choose one of these container images, and UNSTUCK preselects one from the re
 
 ## Reruns
 
-Each time you press Run, UNSTUCK queues a new run. It never changes an old one. Opening the same comment again adds a run, and the [study](/docs/study) counts the review once. UNSTUCK doesn't rerun automatically when you push. Rerunning on an agent's change is [not built yet](/docs/get-it-fixed).
+Each time you press Run, UNSTUCK queues a new run. It never changes an old one. Opening the same comment again adds a run, and the [study](/docs/study) counts the review once. UNSTUCK doesn't rerun automatically when you push. Paste the fix on the check screen to [check it](/docs/get-it-fixed#checking-a-fix), whether you wrote it or an agent did.

@@ -2,9 +2,9 @@ UNSTUCK drafts a reply for you to post under your reviewer's comment. The draft 
 
 ## When the draft opens
 
-The reply screen at `/m/<id>/send` opens when a finished run shows no ask Still missing. Today that means a run on the reviewed commit where every ask either works or has no check. Until then it stays locked and says what's missing: a finished run, at least one picked ask, or a fix that passes.
+The reply screen at `/m/<id>/send` opens when a finished run shows no ask Still missing. That's either a run on the reviewed commit where every ask works or has no check, or the latest [fix check](/docs/get-it-fixed#checking-a-fix) where nothing is still missing. Until then it stays locked and says what's missing: a finished run, at least one picked ask, or a fix that passes.
 
-The second source, a fix from an agent, is [not built yet](/docs/get-it-fixed), and so is the pull request draft that goes with it. Only the reply from a clean run on the reviewed commit is reachable today.
+When the reply comes from a fix check, the screen also drafts a pull request title and body, and the reply links the run that failed before the fix.
 
 ## What the reply says
 

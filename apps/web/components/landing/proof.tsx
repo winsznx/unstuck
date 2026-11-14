@@ -18,7 +18,7 @@ const POINTS = [
   {
     key: "A",
     title: "The commit they reviewed",
-    body: "The last commit before your reviewer's comment, which you confirm before anything runs. Later pushes don't change it, so a record can't show a fix yet.",
+    body: "The last commit before your reviewer's comment, which you confirm before anything runs. Later pushes don't change it. Checking a fix is a separate run.",
   },
   {
     key: "B",
@@ -54,8 +54,8 @@ export function Proof({ view, show }: { view: MilestoneView | undefined; show: S
               <span className="min-w-0">A link your reviewer can check for themselves.</span>
             </h2>
             <p className="mt-(--screen-gap-md) max-w-(--screen-measure) text-lead text-pretty text-log-ink md:max-lg:max-w-none">
-              Every run gets a public page with what ran and what came out, on the commit your reviewer looked at. It shows how you read their asks, not a
-              fix.
+              Every run gets a public page with what ran and what came out, on the commit your reviewer looked at. A fix you check gets its own page
+              too.
             </p>
           </div>
           {view && base ? (

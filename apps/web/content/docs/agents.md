@@ -1,15 +1,15 @@
-This interface is planned and not open. UNSTUCK has no listing on NEAR Agent Market, no MCP server and no Claude Code skill yet, so no agent can hire it today. Everything below describes the contract they are being built to, and the same page at [/agents](/agents) shows a sample answer built from a stored run.
+Other agents can call UNSTUCK today through its MCP server at `https://unstuck-near.vercel.app/mcp`. It needs no sign-in and charges nothing. UNSTUCK has no listing on NEAR Agent Market and no Claude Code skill yet, so those two ways in aren't open. The same page at [/agents](/agents) shows a sample answer built from a stored run.
 
 ## What exists
 
 | Part | State |
 | --- | --- |
 | The check itself | Live on this site, through [/start](/start) |
+| The MCP server at `/mcp`, with four tools | Live |
 | UNSTUCK's own NEAR Agent Market listing | Not listed yet |
-| An MCP tool named `unstuck_check` | Planned |
-| A Claude Code skill | Planned |
+| A Claude Code skill | Not built yet |
 
-There is no API route for the check today. The shapes below are what [/agents](/agents) shows and what the answer builder in the site produces from stored rows.
+The MCP server builds a check the same way [/start](/start) does and returns the answer described below.
 
 ## The job
 
@@ -20,8 +20,9 @@ An agent hands UNSTUCK the reviewer's comment on a public GitHub thread. UNSTUCK
 | Field | Required | Meaning |
 | --- | --- | --- |
 | `thread` | Yes | A public GitHub issue or pull request URL. A link to one comment picks that comment |
-| `asks` | No | The reviewer's sentences that count as asks, copied exactly. A sentence that isn't in the comment word for word is refused |
-| `checks` | No | Shell commands run offline at the reviewed commit, each tied to an ask by its number. An ask with no check comes back `not_sure` |
+| `repo` | No | The code repo's GitHub address, when the thread links several or none |
+| `asks` | No | The reviewer's sentences that count as asks, copied exactly. A sentence that isn't in the comment word for word is refused. Leave it out and NEAR AI picks them from the comment |
+| `checks` | No | `{ ask, command }` pairs. Each command runs offline at the reviewed commit and is tied to an ask by its number. An ask with no check gets one suggested from the repo |
 | `image` | No | The container image for the checks. The default is picked from the repo's own files |
 
 ### What comes back
@@ -40,11 +41,22 @@ The verdicts map to the tags on [Asks and tags](/docs/asks-and-tags): `still_mis
 
 ## Three ways to call it
 
+- An MCP server. Live at `https://unstuck-near.vercel.app/mcp`, stateless Streamable HTTP, no sign-in. Claude Code connects with `claude mcp add --transport http unstuck https://unstuck-near.vercel.app/mcp`.
 - A job on NEAR Agent Market. Not listed yet. The brief would carry the thread link, and the answer would come back as the delivery, with the run record link as the evidence.
-- An MCP tool. Planned. One tool, `unstuck_check`, with the same input fields and the same answer.
-- A Claude Code skill. Planned. A terminal command, `unstuck check <thread-url>`, that prints the asks, their verdicts and the brief.
+- A Claude Code skill. Not built yet.
 
-## What every answer would hold to
+### The MCP tools
+
+| Tool | Input | What it returns |
+| --- | --- | --- |
+| `unstuck_check` | `thread`, and optionally `repo`, `asks`, `checks` and `image` | Starts a check and returns `milestoneId`, `asksFrom` (`caller` or `near-ai`) and the answer above as the run starts |
+| `unstuck_status` | `milestone` | The answer above, plus `fix`: the latest fix run with each ask's change, or `null` |
+| `unstuck_check_fix` | `milestone`, `fix` | Starts a fix check from a pull request link, commit link or SHA and returns the fix run's record link |
+| `unstuck_suggest_asks` | `thread` | The sentences NEAR AI counts as asks, word for word with their position and a reason. Runs nothing |
+
+Runs take one to a few minutes, so poll `unstuck_status` until `status` is no longer `running`. A fix is checked the way [Checking a fix](/docs/get-it-fixed#checking-a-fix) describes, and each ask in `fix` comes back `fixed`, `still-missing`, `broke`, `still-works`, `unsure` or `pending`. Runs share one worker, so a new check is refused while 6 runs are waiting or running. Nothing posts to GitHub.
+
+## What every answer holds to
 
 - It reads and doesn't write. No comments, pushes or pull requests come from the check itself.
 - Asks are the reviewer's exact sentences with their position in the comment. Nothing is summarized into a different claim.
@@ -53,4 +65,4 @@ The verdicts map to the tags on [Asks and tags](/docs/asks-and-tags): `still_mis
 
 ## Price
 
-Not listed yet. When the listing opens, the price is set on NEAR Agent Market and shown there before a job is posted. Grantees using UNSTUCK directly read and rerun for free. [Hiring a fix](/docs/get-it-fixed) covers the other direction, where UNSTUCK hires an agent.
+The MCP server is free. There's no Agent Market listing yet, so there's no price there. When the listing opens, the price is set on NEAR Agent Market and shown there before a job is posted. Grantees using UNSTUCK directly read and rerun for free. [Hiring a fix](/docs/get-it-fixed) covers the other direction, where UNSTUCK hires an agent.

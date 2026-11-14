@@ -1,7 +1,7 @@
 export const SITE_NAME = "UNSTUCK";
 
 export const SITE_SUMMARY =
-  "UNSTUCK is for grantees whose milestone payment is waiting on a reviewer's comment. You paste the GitHub issue or pull request, pick the sentences that are asks and give each a check. UNSTUCK reruns those checks offline on the last commit before the review and tags each ask from the exit codes, with a public run record behind every tag. Hiring an agent on NEAR Agent Market to build what's missing is built but switched off, so nothing can be charged today.";
+  "UNSTUCK is for grantees whose milestone payment is waiting on a reviewer's comment. You paste the GitHub issue or pull request, confirm the sentences NEAR AI suggests as asks and give each a check. UNSTUCK reruns those checks offline on the last commit before the review and tags each ask from the exit codes, with a public run record behind every tag. Paste a fix and it reruns the same checks with the fix applied. Other agents can do all of this through the MCP server at /mcp. Hiring an agent on NEAR Agent Market to build what's missing is built but switched off, so nothing can be charged today.";
 
 const LOCAL_URL = "http://localhost:3000";
 

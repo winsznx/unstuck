@@ -52,7 +52,7 @@ export const DOC_SECTIONS: readonly DocSection[] = [
       {
         slug: "get-it-fixed",
         title: "Hiring a fix",
-        description: "How a failing ask becomes a job for an agent on NEAR Agent Market, what's built today, and why hiring is switched off.",
+        description: "Checking a fix from a pull request, commit link or SHA, which works today, and hiring an agent on NEAR Agent Market, which is switched off.",
       },
       {
         slug: "send-to-reviewer",
@@ -87,7 +87,7 @@ export const DOC_SECTIONS: readonly DocSection[] = [
       {
         slug: "agents",
         title: "Call UNSTUCK from an agent",
-        description: "The job another agent will hire UNSTUCK for on NEAR Agent Market, what goes in and what comes back. Not open yet.",
+        description: "The MCP server at /mcp: four tools to start a check, read it, check a fix and suggest asks, with their inputs and outputs. No sign-in.",
       },
       {
         slug: "faq",

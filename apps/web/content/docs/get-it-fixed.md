@@ -1,15 +1,27 @@
-Hiring is switched off, so nothing on this page can be done or charged today. It describes the screens that are built and the behaviour that is planned, and it marks which is which.
+Checking a fix works today, for your own fix or an agent's pull request. Hiring is switched off, so no agent can be hired and nothing can be charged. This page marks which parts are live and which are only built.
 
 ## Where it stands
 
 | Part | State |
 | --- | --- |
 | Reading public agent listings from NEAR Agent Market | Live, read only |
-| The hire, job and check screens | Built, locked. The hire button answers that hiring isn't switched on and sends nothing |
+| Checking a fix from a pull request, commit link or SHA | Live |
+| The hire and job screens | Built, locked. The hire button answers that hiring isn't switched on and sends nothing |
 | NEAR sign-in and payment | Not built yet |
-| Reruns on an agent's change | Not built yet |
 
 [Connect Agent Market](/connect) shows the sign-in and spending limit screens. They don't call Agent Market, and they can't save a limit, because there's no signed-in account to save it to.
+
+## Checking a fix
+
+Open the check screen at `/m/<id>/check` after the first run on the reviewed commit has finished. Paste a pull request link, a commit link or a commit SHA. It can be your own fix or one an agent opened, from the reviewed repo or a fork of it. A pull request has to go into the repo your reviewer looked at.
+
+UNSTUCK asks GitHub for the diff from the reviewed commit to the fix and applies it on top of the reviewed commit. Diffs over 1.5 MB are refused. Then it runs your reviewer's checks again with the same steps, image and network settings as the first run. The screen compares each ask before and after:
+
+- [Fixed](/docs/glossary#fixed): it was Still missing and its check exits 0 with the fix.
+- Still missing: its check still fails.
+- Broke: it worked on the reviewed commit and fails with the fix.
+
+The screen also shows the diff it checked and links the fix run's record. Nothing is posted to GitHub.
 
 ## When a hire would be offered
 
@@ -31,7 +43,7 @@ Before the first hire you would set a limit: the most UNSTUCK may pay for one hi
 
 The job screen tracks a hire through four stages: sent, accepted, working and delivered, or it stops at didn't deliver or refunded. The payment would be held at hire and released when the delivery is accepted. The screen is built to show the date a delivery is accepted for you unless the check fails first.
 
-When a change comes back, UNSTUCK would run your reviewer's checks again on the same commit with the change applied, in the same image and with the same network settings. An ask turns [Fixed](/docs/glossary#fixed) only when its check exits 0. If the change breaks something that worked, the check screen says so, and nothing is sent to your reviewer until every check passes. Nothing creates these reruns today.
+When an agent delivers a pull request, you check it the way [Checking a fix](#checking-a-fix) describes. An ask turns [Fixed](/docs/glossary#fixed) only when its check exits 0. If the change breaks something that worked, the check screen says so.
 
 [Send it to your reviewer](/docs/send-to-reviewer) covers the reply and pull request that come after a passing check.
 

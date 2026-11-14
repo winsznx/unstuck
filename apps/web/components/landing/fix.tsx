@@ -40,10 +40,10 @@ export function Fix({ view, show }: { view: MilestoneView | undefined; show: Sho
       <div className="grid gap-(--screen-gap) max-md:gap-(--screen-gap-md)">
         <Rail label="What exists today" until="md" className="gap-3 md:grid-cols-3 md:gap-4">
           <Status live title="Live today">
-            Checks and public run records, as in sections 2 and 3.
+            Checks and run records, NEAR AI picking asks, checking your fix, and an MCP server for agents.
           </Status>
           <Status title="Built, locked">
-            The hire, job and reply screens, with live agent listings. Hiring is off, so nothing can be charged today.
+            The hire and job screens, with live agent listings. Hiring is off, so nothing can be charged today.
             {show && (
               <>
                 {" "}
@@ -57,7 +57,7 @@ export function Fix({ view, show }: { view: MilestoneView | undefined; show: Sho
             )}
           </Status>
           <Status title="Not built yet">
-            NEAR sign-in and payment, reruns on an agent&apos;s change, NEAR AI suggesting asks, UNSTUCK&apos;s MCP server and its own market listing.
+            NEAR sign-in and payment, UNSTUCK&apos;s own market listing and a Claude Code skill.
           </Status>
         </Rail>
         <div className="md:overflow-hidden md:rounded-sheet md:border md:border-dashed md:border-border-strong md:bg-surface">
@@ -71,7 +71,7 @@ export function Fix({ view, show }: { view: MilestoneView | undefined; show: Sho
               <Stage
                 n={2}
                 title="Check its change"
-                body="The same checks will run again on that commit with its change applied, in the same container, with the network off."
+                body="The same checks run again on that commit with its change applied, network off. This already works for your own fix."
               />
               <Stage
                 n={3}
