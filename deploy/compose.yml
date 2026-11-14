@@ -1,0 +1,47 @@
+name: unstuck
+
+services:
+  db:
+    image: postgres:17-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: unstuck
+      POSTGRES_DB: unstuck
+      POSTGRES_PASSWORD_FILE: /run/secrets/db_password
+    secrets: [db_password]
+    volumes: [db:/var/lib/postgresql/data]
+    healthcheck:
+      test: ["CMD", "pg_isready", "-U", "unstuck"]
+      interval: 10s
+
+  web:
+    build: { context: .., dockerfile: deploy/web.Dockerfile, args: { SITE_URL: "${SITE_URL:-}" } }
+    restart: unless-stopped
+    depends_on: { db: { condition: service_healthy } }
+    ports: ["${UNSTUCK_PORT:-8791}:3000"]
+    secrets: [db_password]
+    group_add: ["${SECRETS_GID:-1000}"]
+    env_file: [{ path: ./web.env, required: false }]
+    mem_limit: 1g
+
+  worker:
+    build: { context: .., dockerfile: deploy/worker.Dockerfile }
+    restart: unless-stopped
+    depends_on: { db: { condition: service_healthy } }
+    secrets: [db_password]
+    env_file: [{ path: ./worker.env, required: false }]
+    environment:
+      REPLAY_CONCURRENCY: "1"
+      REPLAY_MEMORY: 3g
+      REPLAY_CPUS: "2"
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+    stop_grace_period: 30s
+    mem_limit: 512m
+
+secrets:
+  db_password:
+    file: ./secrets/db_password
+
+volumes:
+  db:
