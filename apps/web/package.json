@@ -12,6 +12,7 @@
     "guardrails": "node scripts/guardrails.mjs"
   },
   "dependencies": {
+    "@modelcontextprotocol/sdk": "1.31.0",
     "@unstuck/core": "workspace:*",
     "@unstuck/db": "workspace:*",
     "@unstuck/integrations": "workspace:*",
