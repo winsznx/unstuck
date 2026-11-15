@@ -18,7 +18,7 @@ const WONT = [
     title: "Call something fixed on trust",
     body: "Works only means its check exited 0. The record shows the exact command, so your reviewer judges whether it tests what they asked.",
   },
-  { title: "Spend past your limit", body: "Once hiring ships, every hire stays under the limit you set first." },
+  { title: "Spend past your limit", body: "Every hire is checked against the spending limit you set first." },
 ] as const;
 
 /**

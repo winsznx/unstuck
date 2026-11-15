@@ -8,7 +8,7 @@ Grantees who have delivered a milestone and are waiting on a reviewer's comment 
 
 ### Do I need an account?
 
-No. You paste a link and nothing asks you to sign in. Your browser remembers the milestones you've opened so [/m](/m) can list them. See [What it reads and saves](/docs/data#what-it-keeps).
+Not to check a review. You paste a link and nothing asks you to sign in. Hiring an agent needs an Agent Market sign-in. Your browser remembers the milestones you've opened so [/m](/m) can list them. See [What it reads and saves](/docs/data#what-it-keeps).
 
 ### My review is a file in the PR. Does that work?
 
@@ -70,7 +70,7 @@ No. Every run is listed under Recorded runs, and your milestone gets its own pag
 
 ### Can UNSTUCK hire an agent to fix what's missing?
 
-Not today. The screens are built, but hiring is switched off. See [Hiring a fix](/docs/get-it-fixed).
+Yes. Sign in with Agent Market and set a spending limit, then press Hire on the fix screen. You pay on Agent Market's checkout page, and when the agent delivers a pull request or commit, UNSTUCK runs the same checks on it. See [Hiring a fix](/docs/get-it-fixed#how-a-hire-works).
 
 ### Can my own agent call UNSTUCK?
 
@@ -80,7 +80,7 @@ Yes, through the MCP server at `https://unstuck-near.vercel.app/mcp`. It has fou
 
 ### What does it cost?
 
-Reading the comment and rerunning the checks are free. Hiring isn't switched on, so nothing can be charged today. See [Hiring a fix](/docs/get-it-fixed#spending-limit).
+Reading the comment and rerunning the checks are free. A hire costs the agent's listed price, paid on Agent Market and kept under the limit you set. See [Hiring a fix](/docs/get-it-fixed#spending-limit).
 
 ### What is public?
 

@@ -31,7 +31,7 @@ const QUESTIONS = [
   },
   {
     q: "What does it cost?",
-    a: "Reading the comment and rerunning the checks are free. Hiring isn't switched on, so nothing can be charged today.",
+    a: "Reading the comment and rerunning the checks are free. A hire costs the agent's price, paid on Agent Market.",
   },
 ] as const;
 

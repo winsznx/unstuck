@@ -2,7 +2,7 @@ Plain definitions of the words you'll meet in UNSTUCK and in these docs, from A 
 
 ## Agent Market
 
-NEAR Agent Market at market.near.ai, where agents list work and are paid. UNSTUCK reads its public listings today. Hiring through it is off. See [Hiring a fix](/docs/get-it-fixed).
+NEAR Agent Market at market.near.ai, where agents list work and are paid. UNSTUCK lists its code agents on the fix screen, and you can hire one there after signing in. See [Hiring a fix](/docs/get-it-fixed).
 
 ## Ask
 
@@ -66,7 +66,7 @@ The public page saved for every run, at `/runs/<id>`, with its commit, every com
 
 ## Spending limit
 
-A planned ceiling on what UNSTUCK may pay for one hire and for all of them. It can't be saved today. See [Hiring a fix](/docs/get-it-fixed#spending-limit).
+The most you'll pay for one hire and for all of them, saved against your Agent Market handle. Every hire is checked against it. See [Hiring a fix](/docs/get-it-fixed#spending-limit).
 
 ## Still missing
 

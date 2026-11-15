@@ -53,7 +53,7 @@ export function JobTracker({ status, agentName, agentHandle, priceCents, created
       </ol>
       {(marketUrl || (autoAcceptAt && status === "delivered")) && (
         <footer className="flex flex-wrap items-center justify-between gap-3 border-t border-border px-5 py-3 text-small text-ink-secondary">
-          {autoAcceptAt && status === "delivered" ? <span>Accepted for you on {clock(autoAcceptAt)} unless the check fails first.</span> : <span />}
+          {autoAcceptAt && status === "delivered" ? <span>Agent Market accepts it for you on {clock(autoAcceptAt)} unless you send it back there first.</span> : <span />}
           {marketUrl && (
             <a className="font-medium text-ink underline underline-offset-4" href={marketUrl}>
               Open on Agent Market

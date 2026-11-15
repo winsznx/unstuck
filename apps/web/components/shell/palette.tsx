@@ -80,7 +80,7 @@ export function Palette() {
       { key: "run", label: "Open run record", hint: jump.id.slice(0, 8), run: () => go(`/runs/${jump.id}`) },
     );
   }
-  const places = [START, ...PLACES, { href: "/connect", label: "Connect Agent Market", hint: "Not switched on yet. Sign-in comes with hiring" }];
+  const places = [START, ...PLACES, { href: "/connect", label: "Connect Agent Market", hint: "Sign in with a code to hire agents" }];
   for (const place of places) {
     if (!needle || jump || `${place.label} ${place.hint}`.toLowerCase().includes(needle)) {
       if (!jump) actions.push({ key: place.href, label: place.label, hint: place.hint, run: () => go(place.href) });

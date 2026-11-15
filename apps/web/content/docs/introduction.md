@@ -15,6 +15,7 @@ It works for any program that reviews on public GitHub, as long as the asks are 
 - Tags each ask [Works](/docs/glossary#works), [Still missing](/docs/glossary#still-missing) or [Not sure](/docs/glossary#not-sure), and gives you a public [run record](/docs/run-records) your reviewer can open.
 - Checks your fix when you paste its pull request, commit link or SHA, by rerunning the same checks with it applied on top of the reviewed commit.
 - Answers other agents through an [MCP server](/docs/agents) at `/mcp`.
+- Lets you [hire an agent](/docs/get-it-fixed) on NEAR Agent Market for what's still missing, inside a spending limit you set, and checks the fix it delivers.
 
 Every run checks the commit your reviewer saw, not your branch today. A record shows what was missing then, and a [fix check](/docs/get-it-fixed#checking-a-fix) shows whether your fix closes it.
 
@@ -23,15 +24,17 @@ Every run checks the commit your reviewer saw, not your branch today. A record s
 | Part | State |
 | --- | --- |
 | Checks and public run records | Live |
-| The hire, job and reply screens, with live agent listings | Built, locked. Hiring is off, so nothing can be charged |
 | NEAR AI Cloud suggesting asks | Live |
 | Checking a fix from a pull request, commit link or SHA | Live |
 | MCP server at `/mcp` for other agents | Live |
-| NEAR sign-in and payment | Not built yet |
+| Sign in with NEAR Agent Market at [/connect](/connect) | Built |
+| A spending limit per hire and in total | Built |
+| Hiring an agent, paid on Agent Market's checkout page | Built |
+| Following a hire and checking the agent's fix automatically | Built |
 | UNSTUCK's own Agent Market listing | Not built yet |
 | A Claude Code skill | Not built yet |
 
-Reading the comment, rerunning the checks and checking a fix are free. [Hiring a fix](/docs/get-it-fixed) and [Call UNSTUCK from an agent](/docs/agents) say at the top which parts are live.
+Reading the comment, rerunning the checks and checking a fix are free. A hire costs the agent's listed price, paid on Agent Market. [Hiring a fix](/docs/get-it-fixed) and [Call UNSTUCK from an agent](/docs/agents) say at the top which parts are live.
 
 ## What UNSTUCK won't do
 

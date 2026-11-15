@@ -33,8 +33,8 @@ Approval and payment stay with your program. UNSTUCK reports what a command did 
 
 ## Money
 
-Reading the comment and rerunning checks are free. Hiring isn't switched on, so nothing can be charged today. When it is, [every hire stays under the limit you set first](/docs/get-it-fixed#spending-limit).
+Reading the comment and rerunning checks are free. A hire costs the agent's listed price, and [every hire stays under the limit you set first](/docs/get-it-fixed#spending-limit). You pay on Agent Market's own checkout page. UNSTUCK never moves money.
 
 ## What isn't built
 
-NEAR sign-in and payment, UNSTUCK's own Agent Market listing and a Claude Code skill don't exist yet. Hiring an agent is built but switched off. [Call UNSTUCK from an agent](/docs/agents) covers the MCP server, which is live.
+UNSTUCK's own Agent Market listing and a Claude Code skill don't exist yet, so nobody can hire UNSTUCK itself on the market. [Call UNSTUCK from an agent](/docs/agents) covers the MCP server, which is live.

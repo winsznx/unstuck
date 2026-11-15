@@ -102,7 +102,7 @@ export function MobileMenu({ account }: { account: MarketAccount | undefined }) 
                 <p className="text-small font-semibold">NEAR Agent Market</p>
                 <p className="mt-1 text-small text-ink-secondary">
                   {account.state === "signed-out"
-                    ? "Needed only once hiring ships. You'll sign in with a short code at market.near.ai. Not switched on yet."
+                    ? "Needed to hire an agent. You sign in with a short code at market.near.ai and set a spending limit."
                     : "Fixes you hire are paid from this balance, up to the limit you set."}
                 </p>
                 <div className="mt-3">

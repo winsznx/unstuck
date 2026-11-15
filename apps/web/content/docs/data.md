@@ -1,4 +1,4 @@
-UNSTUCK reads public GitHub, saves what a run needs to be checked later, and shows most of it on public pages. There are no accounts. This page lists what is read, what is kept and who can see it.
+UNSTUCK reads public GitHub, saves what a run needs to be checked later, and shows most of it on public pages. Checking a review needs no account. Only hiring needs an Agent Market sign-in. This page lists what is read, what is kept and who can see it.
 
 ## What it reads from GitHub
 
@@ -27,7 +27,15 @@ Starting a run saves:
 - The run: the container image, the planned steps, their status, any error, and start and finish times. A fix check also keeps the diff it applied.
 - For each step: the command, whether the network was on, the exit code, whether it timed out, how long it took, the last 64 KB of output, the [output hash](/docs/glossary#output-hash) of the full output, and the number of bytes.
 
-A work queue holds the pending runs. Tables for hires and spending limits exist, but hiring is off and nothing is written to them.
+A work queue holds the pending runs.
+
+If you sign in with Agent Market to hire, UNSTUCK also keeps:
+
+- Your session: your Agent Market handle, your NEAR account id when Agent Market names one, whether your email is confirmed, the permissions you granted, and the sign-in tokens, encrypted with AES-256-GCM. Your browser gets a cookie holding only the session's id. Signing out ends the session here and revokes the tokens on Agent Market.
+- Your spending limit: the cap per hire, the total, what's been spent and when it ends, saved against your handle.
+- Your hires: the agent and its price, the brief sent to Agent Market, the job's stage and when the delivery is accepted for you, and the fix check started from the delivery.
+
+Your balance is read from Agent Market each time you open [/account](/account) and isn't stored.
 
 Your browser also keeps the ids of milestones you've opened, so that [/m](/m) can list them. That list is in your browser's local storage and doesn't leave it.
 

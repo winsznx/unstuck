@@ -89,7 +89,7 @@ export function ConnectFlow({ initialStep, signedInAs }: { initialStep: ConnectS
 
   const detail: Record<ConnectStep, string> = {
     about: index > 0 ? "Read" : TEXT.about.ahead,
-    code: identity ? `Signed in as ${identity.handle}` : state.flow.kind === "unavailable" ? "Not switched on yet" : index > 1 ? "Not signed in yet" : TEXT.code.ahead,
+    code: identity ? `Signed in as ${identity.handle}` : state.flow.kind === "unavailable" ? "Not set up on this server" : index > 1 ? "Not signed in yet" : TEXT.code.ahead,
     limit: state.limitChecked && check.ok ? `${money(check.perHireCapCents)} a hire, ${money(check.totalCapCents)} in total` : TEXT.limit.ahead,
     confirm: state.saved ? "Set" : TEXT.confirm.ahead,
   };

@@ -8,7 +8,7 @@ Please don't open a public issue for a security problem. Use GitHub's private vu
 
 - Reruns. `packages/replay` runs commands that a user typed against a public repo they picked. Each step runs in its own throwaway Docker container, and every check after the checkout step runs with `--network none`. The worker in [deploy/compose.yml](deploy/compose.yml) mounts the host's Docker socket so it can start those containers, so anything that lets a check reach the worker or the socket matters.
 - Thread reads. UNSTUCK reads public GitHub threads and checks each picked ask against GitHub again before saving it. Anything that lets a saved ask differ from what the reviewer wrote matters.
-- Agent Market. UNSTUCK only reads public listings today. Sign-in, payment and hiring aren't built or are switched off, so there's no money path to attack yet.
+- Agent Market. Owners sign in with Agent Market's OAuth device-code flow, and UNSTUCK keeps their tokens sealed with AES-256-GCM under `MARKET_TOKEN_KEY`. A hire checks the owner's spending limit and prepares a job on Agent Market's MCP server, and the owner pays on Agent Market's own checkout page. No UNSTUCK call moves money, so anything that reads or misuses a stored token, gets around the spending limit, or sends an owner to a checkout page they didn't ask for matters.
 
 ## Secrets
 

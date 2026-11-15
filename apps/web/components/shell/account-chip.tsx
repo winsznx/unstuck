@@ -3,22 +3,21 @@ import { money } from "./money";
 import type { MarketAccount } from "./account";
 
 /**
- * The Agent Market account in the header. Signed out it's a dashed tag, an item not yet done, and it points to the
- * landing's "Coming next" section, because sign-in ships with hiring. Signed in it shows the handle and the balance
- * hires come out of.
+ * The Agent Market account in the header. Signed out it's a dashed tag, an item not yet done, and it points to
+ * /connect, where the owner signs in to hire. Signed in it shows the handle and the balance hires come out of.
  */
 export function AccountChip({ account, full = false }: { account: MarketAccount; full?: boolean }) {
   if (account.state === "signed-out") {
     return (
       <Link
-        href="/#fix"
+        href="/connect"
         className="inline-flex min-h-11 shrink-0 items-center gap-2 rounded-control border border-dashed border-border-strong px-3 text-small font-medium whitespace-nowrap text-ink-secondary transition-colors duration-(--duration-fast) hover:border-ink-muted hover:text-ink"
       >
         <MarketGlyph />
         <span>
           <span className={full ? "" : "max-xl:sr-only"}>NEAR </span>Agent Market
         </span>
-        <span className="border-l border-border-strong pl-2 font-normal text-ink-muted">Soon</span>
+        <span className="border-l border-border-strong pl-2 font-normal text-ink-muted">Connect</span>
       </Link>
     );
   }

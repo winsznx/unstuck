@@ -52,7 +52,7 @@ export const DOC_SECTIONS: readonly DocSection[] = [
       {
         slug: "get-it-fixed",
         title: "Hiring a fix",
-        description: "Checking a fix from a pull request, commit link or SHA, which works today, and hiring an agent on NEAR Agent Market, which is switched off.",
+        description: "Checking a fix from a pull request, commit link or SHA, and hiring an agent on NEAR Agent Market inside a spending limit, paid on Agent Market's checkout page.",
       },
       {
         slug: "send-to-reviewer",

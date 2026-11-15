@@ -9,12 +9,12 @@ import { Rail } from "./rail";
 import { SCREEN_HEADING_GRID, Screen, ScreenPin } from "./screen";
 
 const PAYMENT =
-  "You'll hire one on NEAR Agent Market and get a pull request only once that check passes. If it fails, the work goes back before the agent is paid.";
+  "You hire one on NEAR Agent Market and pay on its own checkout. Its fix runs through the same check, and an ask turns Fixed only when it exits 0.";
 
 /**
- * Parts 3 to 5 of a milestone, written in the future tense until they ship (docs/DESIGN.md 7.2): first what's live,
- * what's built but locked and what isn't built, then the job an agent would get as one dashed work order. The hire
- * screen it links to is real and reads live NEAR Agent Market listings; hiring itself is switched off.
+ * Parts 3 to 5 of a milestone (docs/DESIGN.md 7.2): first what's live, what's built and what isn't built, then the
+ * job an agent gets as one dashed work order. The hire screen it links to reads live NEAR Agent Market listings, and
+ * its Hire button sends the owner to Agent Market's checkout page.
  *
  * From 768 px the three states and the three stages are rows of three, and what the agent gets runs under the stages
  * as the work order's last strip. On a phone both rows swipe and the payment terms join the job's contents in a fold;
@@ -30,7 +30,7 @@ export function Fix({ view, show }: { view: MilestoneView | undefined; show: Sho
       <div className={`${SCREEN_HEADING_GRID} lg:items-start`}>
         <h2 id="fix-title" className="flex items-start gap-3.5 text-section font-semibold text-balance lg:gap-4">
           <ScreenPin n={4} />
-          <span className="min-w-0">Coming next: hire the fix on NEAR Agent Market.</span>
+          <span className="min-w-0">Next: hire the fix on NEAR Agent Market.</span>
         </h2>
         <div className="max-w-(--screen-measure) text-lead text-pretty text-ink-secondary lg:pb-1">
           <p>A failing check is a job an agent can take: the reviewer&apos;s words, the line that failed and a command that has to exit 0.</p>
@@ -42,8 +42,8 @@ export function Fix({ view, show }: { view: MilestoneView | undefined; show: Sho
           <Status live title="Live today">
             Checks and run records, NEAR AI picking asks, checking your fix, and an MCP server for agents.
           </Status>
-          <Status title="Built, locked">
-            The hire and job screens, with live agent listings. Hiring is off, so nothing can be charged today.
+          <Status title="Built">
+            Sign-in, a spending limit and hiring from live agent listings. You pay on Agent Market&apos;s own page.
             {show && (
               <>
                 {" "}
@@ -57,7 +57,7 @@ export function Fix({ view, show }: { view: MilestoneView | undefined; show: Sho
             )}
           </Status>
           <Status title="Not built yet">
-            NEAR sign-in and payment, UNSTUCK&apos;s own market listing and a Claude Code skill.
+            UNSTUCK&apos;s own market listing, so others can hire it there, and a Claude Code skill.
           </Status>
         </Rail>
         <div className="md:overflow-hidden md:rounded-sheet md:border md:border-dashed md:border-border-strong md:bg-surface">
